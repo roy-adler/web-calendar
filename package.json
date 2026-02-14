@@ -1,0 +1,12 @@
+{
+  "name": "web-calendar",
+  "version": "1.0.0",
+  "description": "Simple weekly calendar viewer for ICS feeds",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}
