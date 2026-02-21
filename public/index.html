@@ -390,7 +390,7 @@
   </div>
 
   <script src="web-calendar.js"></script>
-  <script src="lang/all.js"></script>
+  <script src="lang/languages.js"></script>
   <script>
     var icsInput    = document.getElementById("icsUrl");
     var accentPick  = document.getElementById("accentPicker");
@@ -442,7 +442,7 @@
       var host = location.hostname;
       var base = (host === "localhost" || host === "127.0.0.1")
         ? "https://your-server.com" : location.origin;
-      return base + "/lang/all.js";
+      return base + "/lang/languages.js";
     }
 
     function updateSnippet() {
