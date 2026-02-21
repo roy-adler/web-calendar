@@ -290,16 +290,6 @@
       <div class="settings">
         <h2>Settings</h2>
 
-        <div class="field import-field">
-          <label for="importSnippet">Import Existing Snippet</label>
-          <textarea id="importSnippet" rows="3" placeholder='Paste an embed snippet here, e.g. &lt;div data-web-calendar data-url="..." ...&gt;&lt;/div&gt;'></textarea>
-          <button class="btn-import" id="importBtn">Import Settings</button>
-          <div class="import-ok" id="importOk">Settings imported!</div>
-          <div class="import-err" id="importErr"></div>
-        </div>
-
-        <hr class="field-divider" />
-
         <div class="field">
           <label for="icsUrl">ICS Feed URL</label>
           <input id="icsUrl" type="url" placeholder="https://example.com/feed.ics" />
@@ -369,6 +359,16 @@
         </div>
 
         <button class="btn-load" id="loadBtn">Load Calendar</button>
+
+        <hr class="field-divider" />
+
+        <div class="field import-field">
+          <label for="importSnippet">Import Existing Snippet</label>
+          <textarea id="importSnippet" rows="3" placeholder='Paste an embed snippet here, e.g. &lt;div data-web-calendar data-url="..." ...&gt;&lt;/div&gt;'></textarea>
+          <button class="btn-import" id="importBtn">Import Settings</button>
+          <div class="import-ok" id="importOk">Settings imported!</div>
+          <div class="import-err" id="importErr"></div>
+        </div>
       </div>
 
       <!-- Preview + snippet -->
