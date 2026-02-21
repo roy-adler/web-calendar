@@ -487,10 +487,15 @@
       updateSnippet();
     }
 
+    function syncPageAccent(color) {
+      document.documentElement.style.setProperty("--cfg-accent", color);
+    }
+
     function bindColorPair(picker, hex, optionKey) {
       picker.addEventListener("input", function () {
         hex.value = this.value;
         if (cal) cal.setOption(optionKey, this.value);
+        if (optionKey === "accent") syncPageAccent(this.value);
         updateSnippet();
       });
       hex.addEventListener("input", function () {
@@ -498,6 +503,7 @@
         if (/^#[0-9a-f]{6}$/i.test(v)) {
           picker.value = v;
           if (cal) cal.setOption(optionKey, v);
+          if (optionKey === "accent") syncPageAccent(v);
         }
         updateSnippet();
       });
@@ -578,6 +584,7 @@
       if (url) icsInput.value = url;
       if (accent && /^#[0-9a-f]{3,6}$/i.test(accent)) {
         accentHex.value = accent; accentPick.value = accent;
+        syncPageAccent(accent);
       }
       if (bg && /^#[0-9a-f]{3,6}$/i.test(bg)) {
         bgHex.value = bg; bgPick.value = bg;
