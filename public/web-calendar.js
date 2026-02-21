@@ -156,6 +156,35 @@
     }
   `;
 
+  function hexToRgb(hex) {
+    hex = hex.replace(/^#/, "");
+    if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+    var n = parseInt(hex, 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+
+  function rgbToHex(r, g, b) {
+    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  }
+
+  function tint(hex, amount) {
+    var rgb = hexToRgb(hex);
+    return rgbToHex(
+      Math.round(rgb[0] + (255 - rgb[0]) * amount),
+      Math.round(rgb[1] + (255 - rgb[1]) * amount),
+      Math.round(rgb[2] + (255 - rgb[2]) * amount)
+    );
+  }
+
+  function applyAccent(el, accent) {
+    if (!accent) return;
+    var s = el.style;
+    s.setProperty("--wc-accent", accent);
+    s.setProperty("--wc-event-bg", accent);
+    s.setProperty("--wc-accent-light", tint(accent, 0.88));
+    s.setProperty("--wc-today-bg", tint(accent, 0.93));
+  }
+
   var DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
@@ -245,12 +274,16 @@
 
     injectStyles();
     this.el.classList.add("wc-container");
+    if (this.opts.accent) applyAccent(this.el, this.opts.accent);
 
     this._calDiv = document.createElement("div");
 
     if (this.opts.url) {
       this.el.appendChild(this._calDiv);
       this.loadFeed(this.opts.url);
+    } else if (this.opts.noInput) {
+      this.el.appendChild(this._calDiv);
+      this._render();
     } else {
       this._buildFeedBar();
       this.el.appendChild(this._calDiv);
@@ -307,15 +340,13 @@
   WebCalendar.prototype._render = function () {
     var self = this;
 
-    if (this.events.length === 0 && this.weekOffset === 0 && !this.opts.url) {
-      this._calDiv.innerHTML =
-        '<div class="wc-empty-state">Paste an ICS feed URL above and hit Load.</div>';
-      return;
-    }
-
-    if (this.events.length === 0 && this.weekOffset === 0 && this.opts.url) {
-      this._calDiv.innerHTML =
-        '<div class="wc-empty-state">No events found in the calendar feed.</div>';
+    if (this.events.length === 0 && this.weekOffset === 0) {
+      var msg = this.opts.url
+        ? "No events found in the calendar feed."
+        : this.opts.noInput
+          ? "Enter an ICS feed URL and click Load."
+          : "Paste an ICS feed URL above and hit Load.";
+      this._calDiv.innerHTML = '<div class="wc-empty-state">' + msg + '</div>';
       return;
     }
 
@@ -384,6 +415,11 @@
     });
   };
 
+  WebCalendar.prototype.setAccent = function (color) {
+    this.opts.accent = color;
+    applyAccent(this.el, color);
+  };
+
   // ---- Public API ----
   window.WebCalendar = WebCalendar;
 
@@ -400,8 +436,10 @@
     document.querySelectorAll("[data-web-calendar]").forEach(function (el) {
       if (el._webCalendar) return;
       var url = el.getAttribute("data-url") || "";
+      var accent = el.getAttribute("data-accent") || "";
       el._webCalendar = new WebCalendar(el, {
         url: url || undefined,
+        accent: accent || undefined,
         server: server || el.getAttribute("data-server") || ""
       });
     });
