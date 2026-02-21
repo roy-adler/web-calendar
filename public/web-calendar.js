@@ -157,6 +157,121 @@
         padding: 0.5rem 0.8rem;
       }
     }
+    .wc-view-select {
+      padding: 0.4rem 0.6rem;
+      background: var(--wc-card);
+      border: 1px solid var(--wc-border);
+      border-radius: var(--wc-radius);
+      font-size: 0.85rem;
+      font-weight: 500;
+      font-family: inherit;
+      color: var(--wc-text);
+      cursor: pointer;
+      outline: none;
+      margin-left: 0.4rem;
+    }
+    .wc-view-select:focus { border-color: var(--wc-accent); }
+    .wc-day-view {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .wc-day-event-card {
+      background: var(--wc-card);
+      border: 1px solid var(--wc-border);
+      border-radius: var(--wc-radius);
+      padding: 0.75rem 1rem;
+      border-left: 3px solid var(--wc-accent);
+    }
+    .wc-day-event-card .wc-event-time {
+      font-size: 0.8rem;
+      color: var(--wc-text-light);
+      margin-bottom: 0.15rem;
+    }
+    .wc-day-event-card .wc-event-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .wc-day-event-card .wc-event-location {
+      font-size: 0.8rem;
+      color: var(--wc-text-light);
+      font-style: italic;
+      margin-top: 0.1rem;
+    }
+    .wc-day-event-card .wc-event-desc {
+      font-size: 0.8rem;
+      color: var(--wc-text-light);
+      margin-top: 0.25rem;
+      line-height: 1.4;
+    }
+    .wc-day-empty {
+      text-align: center;
+      color: var(--wc-text-light);
+      padding: 2rem 1rem;
+      font-size: 0.9rem;
+    }
+    .wc-month-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1px;
+      background: var(--wc-border);
+      border-radius: var(--wc-radius);
+      overflow: hidden;
+      border: 1px solid var(--wc-border);
+    }
+    .wc-month-dow {
+      background: var(--wc-card);
+      text-align: center;
+      padding: 0.5rem 0.25rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--wc-text-light);
+    }
+    .wc-month-day {
+      background: var(--wc-card);
+      min-height: 80px;
+      padding: 0.25rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .wc-month-day.wc-outside { opacity: 0.35; }
+    .wc-month-day.wc-today { background: var(--wc-today-bg); }
+    .wc-month-day-num {
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 0.1rem 0.25rem;
+      margin-bottom: 0.1rem;
+    }
+    .wc-month-day.wc-today .wc-month-day-num { color: var(--wc-accent); }
+    .wc-month-events {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      overflow: hidden;
+    }
+    .wc-month-event {
+      font-size: 0.68rem;
+      padding: 0.1rem 0.25rem;
+      border-radius: 3px;
+      background: var(--wc-event-bg);
+      color: var(--wc-event-text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.4;
+    }
+    .wc-month-more {
+      font-size: 0.65rem;
+      color: var(--wc-text-light);
+      padding: 0.05rem 0.25rem;
+    }
+    @media (max-width: 640px) {
+      .wc-month-day { min-height: 50px; }
+      .wc-month-event { font-size: 0.6rem; }
+    }
   `;
 
   function hexToRgb(hex) {
@@ -203,7 +318,8 @@
     bg: "#f8f9fa",
     textColor: "#1a202c",
     cardColor: "#ffffff",
-    radius: "10"
+    radius: "10",
+    view: "week"
   };
 
   function applyStyles(el, opts) {
@@ -239,6 +355,7 @@
 
   var DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var MONTHS_FULL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
   function injectStyles() {
     if (STYLES_INJECTED) return;
@@ -314,6 +431,25 @@
     return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   }
 
+  function getDayStart(offset) {
+    var d = new Date();
+    d.setDate(d.getDate() + offset);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
+  function getMonthData(offset) {
+    var now = new Date();
+    var month = now.getMonth() + offset;
+    var year = now.getFullYear();
+    year += Math.floor(month / 12);
+    month = ((month % 12) + 12) % 12;
+    var firstDay = new Date(year, month, 1);
+    var daysInMonth = new Date(year, month + 1, 0).getDate();
+    var startDow = (firstDay.getDay() + 6) % 7;
+    return { year: year, month: month, daysInMonth: daysInMonth, startDow: startDow };
+  }
+
   // ---- WebCalendar class ----
   function WebCalendar(el, opts) {
     this.el = typeof el === "string" ? document.querySelector(el) : el;
@@ -322,6 +458,8 @@
     this.opts = opts || {};
     this.events = [];
     this.weekOffset = 0;
+    this.dayOffset = 0;
+    this.monthOffset = 0;
     this.server = this.opts.server || SCRIPT_ORIGIN || "";
 
     injectStyles();
@@ -390,9 +528,10 @@
   };
 
   WebCalendar.prototype._render = function () {
-    var self = this;
+    var view = this.opts.view || "week";
+    var offset = view === "day" ? this.dayOffset : view === "month" ? this.monthOffset : this.weekOffset;
 
-    if (this.events.length === 0 && this.weekOffset === 0) {
+    if (this.events.length === 0 && offset === 0) {
       var msg = this.opts.url
         ? "No events found in the calendar feed."
         : this.opts.noInput
@@ -402,25 +541,73 @@
       return;
     }
 
+    if (view === "day") this._renderDay();
+    else if (view === "month") this._renderMonth();
+    else this._renderWeek();
+  };
+
+  WebCalendar.prototype._navHtml = function (label) {
+    var view = this.opts.view || "week";
+    return '<div class="wc-week-nav">' +
+      '<div class="wc-btns">' +
+        '<button data-wc-nav="prev">\u2039 Prev</button>' +
+        '<button data-wc-nav="today">Today</button>' +
+        '<button data-wc-nav="next">Next \u203a</button>' +
+        '<select class="wc-view-select" data-wc-view>' +
+          '<option value="day"' + (view === "day" ? " selected" : "") + '>Day</option>' +
+          '<option value="week"' + (view === "week" ? " selected" : "") + '>Week</option>' +
+          '<option value="month"' + (view === "month" ? " selected" : "") + '>Month</option>' +
+        '</select>' +
+      '</div>' +
+      '<div class="wc-label">' + label + '</div>' +
+    '</div>';
+  };
+
+  WebCalendar.prototype._bindNavListeners = function () {
+    var self = this;
+    var view = this.opts.view || "week";
+
+    this._calDiv.querySelectorAll("[data-wc-nav]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var action = this.getAttribute("data-wc-nav");
+        if (view === "day") {
+          if (action === "prev") self.dayOffset--;
+          else if (action === "next") self.dayOffset++;
+          else self.dayOffset = 0;
+        } else if (view === "month") {
+          if (action === "prev") self.monthOffset--;
+          else if (action === "next") self.monthOffset++;
+          else self.monthOffset = 0;
+        } else {
+          if (action === "prev") self.weekOffset--;
+          else if (action === "next") self.weekOffset++;
+          else self.weekOffset = 0;
+        }
+        self._render();
+      });
+    });
+
+    var viewSelect = self._calDiv.querySelector("[data-wc-view]");
+    if (viewSelect) {
+      viewSelect.addEventListener("change", function () {
+        self.opts.view = this.value;
+        self._render();
+      });
+    }
+  };
+
+  WebCalendar.prototype._renderWeek = function () {
     var weekStart = getWeekStart(this.weekOffset);
     var weekEnd = new Date(weekStart);
     weekEnd.setDate(weekEnd.getDate() + 6);
     var label = weekStart.getDate() + " " + MONTHS[weekStart.getMonth()] +
-      " – " + weekEnd.getDate() + " " + MONTHS[weekEnd.getMonth()] +
+      " \u2013 " + weekEnd.getDate() + " " + MONTHS[weekEnd.getMonth()] +
       " " + weekEnd.getFullYear();
 
     var today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    var html = '<div class="wc-week-nav">' +
-      '<div class="wc-btns">' +
-        '<button data-wc-nav="prev">‹ Prev</button>' +
-        '<button data-wc-nav="today">Today</button>' +
-        '<button data-wc-nav="next">Next ›</button>' +
-      '</div>' +
-      '<div class="wc-label">' + label + '</div>' +
-    '</div>' +
-    '<div class="wc-week-grid">';
+    var html = this._navHtml(label) + '<div class="wc-week-grid">';
 
     for (var i = 0; i < 7; i++) {
       var day = new Date(weekStart);
@@ -441,7 +628,7 @@
         html += '<div class="wc-event">';
         if (ev.dtend) {
           html += '<div class="wc-event-time">' + formatTime(ev.dtstart) +
-            " – " + formatTime(ev.dtend) + '</div>';
+            " \u2013 " + formatTime(ev.dtend) + '</div>';
         }
         html += '<div class="wc-event-title">' + escapeHtml(ev.summary) + '</div>';
         if (ev.location) {
@@ -455,16 +642,96 @@
 
     html += '</div>';
     this._calDiv.innerHTML = html;
+    this._bindNavListeners();
+  };
 
-    this._calDiv.querySelectorAll("[data-wc-nav]").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        var action = this.getAttribute("data-wc-nav");
-        if (action === "prev") self.weekOffset--;
-        else if (action === "next") self.weekOffset++;
-        else self.weekOffset = 0;
-        self._render();
-      });
-    });
+  WebCalendar.prototype._renderDay = function () {
+    var day = getDayStart(this.dayOffset);
+    var dowNames = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    var label = dowNames[day.getDay()] + ", " +
+      MONTHS_FULL[day.getMonth()] + " " + day.getDate() + ", " + day.getFullYear();
+
+    var dayEvents = this.events
+      .filter(function (e) { return isSameDay(e.dtstart, day); })
+      .sort(function (a, b) { return a.dtstart - b.dtstart; });
+
+    var html = this._navHtml(label) + '<div class="wc-day-view">';
+
+    if (dayEvents.length === 0) {
+      html += '<div class="wc-day-empty">No events for this day</div>';
+    } else {
+      for (var i = 0; i < dayEvents.length; i++) {
+        var ev = dayEvents[i];
+        html += '<div class="wc-day-event-card">';
+        if (ev.dtend) {
+          html += '<div class="wc-event-time">' + formatTime(ev.dtstart) +
+            " \u2013 " + formatTime(ev.dtend) + '</div>';
+        }
+        html += '<div class="wc-event-title">' + escapeHtml(ev.summary) + '</div>';
+        if (ev.location) {
+          html += '<div class="wc-event-location">' + escapeHtml(ev.location) + '</div>';
+        }
+        if (ev.description) {
+          html += '<div class="wc-event-desc">' + escapeHtml(ev.description) + '</div>';
+        }
+        html += '</div>';
+      }
+    }
+
+    html += '</div>';
+    this._calDiv.innerHTML = html;
+    this._bindNavListeners();
+  };
+
+  WebCalendar.prototype._renderMonth = function () {
+    var md = getMonthData(this.monthOffset);
+    var label = MONTHS_FULL[md.month] + " " + md.year;
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    var html = this._navHtml(label) + '<div class="wc-month-grid">';
+
+    for (var d = 0; d < 7; d++) {
+      html += '<div class="wc-month-dow">' + DOW[d] + '</div>';
+    }
+
+    var startDate = new Date(md.year, md.month, 1);
+    startDate.setDate(startDate.getDate() - md.startDow);
+    var totalDays = md.startDow + md.daysInMonth;
+    var rows = Math.ceil(totalDays / 7);
+    var totalCells = rows * 7;
+
+    for (var i = 0; i < totalCells; i++) {
+      var cellDate = new Date(startDate);
+      cellDate.setDate(startDate.getDate() + i);
+      var isOutside = cellDate.getMonth() !== md.month;
+      var isToday = isSameDay(cellDate, today);
+
+      var classes = "wc-month-day";
+      if (isOutside) classes += " wc-outside";
+      if (isToday) classes += " wc-today";
+
+      html += '<div class="' + classes + '">';
+      html += '<div class="wc-month-day-num">' + cellDate.getDate() + '</div>';
+
+      var cellEvents = this.events
+        .filter(function (e) { return isSameDay(e.dtstart, cellDate); })
+        .sort(function (a, b) { return a.dtstart - b.dtstart; });
+
+      html += '<div class="wc-month-events">';
+      var maxShow = 2;
+      for (var j = 0; j < Math.min(cellEvents.length, maxShow); j++) {
+        html += '<div class="wc-month-event">' + escapeHtml(cellEvents[j].summary) + '</div>';
+      }
+      if (cellEvents.length > maxShow) {
+        html += '<div class="wc-month-more">+' + (cellEvents.length - maxShow) + ' more</div>';
+      }
+      html += '</div></div>';
+    }
+
+    html += '</div>';
+    this._calDiv.innerHTML = html;
+    this._bindNavListeners();
   };
 
   WebCalendar.prototype.setAccent = function (color) {
@@ -474,7 +741,11 @@
 
   WebCalendar.prototype.setOption = function (key, value) {
     this.opts[key] = value;
-    applyStyles(this.el, this.opts);
+    if (key === "view") {
+      this._render();
+    } else {
+      applyStyles(this.el, this.opts);
+    }
   };
 
   WebCalendar.DEFAULTS = DEFAULTS;
@@ -492,13 +763,15 @@
       var textColor = el.getAttribute("data-text-color") || "";
       var cardColor = el.getAttribute("data-card-color") || "";
       var radius = el.getAttribute("data-radius");
+      var view = el.getAttribute("data-view") || "";
       el._webCalendar = new WebCalendar(el, {
         url: url || undefined,
         accent: accent || undefined,
         bg: bg || undefined,
         textColor: textColor || undefined,
         cardColor: cardColor || undefined,
-        radius: radius != null ? radius : undefined
+        radius: radius != null ? radius : undefined,
+        view: view || undefined
       });
     });
   }

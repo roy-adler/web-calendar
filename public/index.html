@@ -93,6 +93,22 @@
     .field input[type="text"]:focus {
       border-color: var(--cfg-accent);
     }
+    .field select {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      border: 1px solid var(--cfg-border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+      background: var(--cfg-card);
+      color: var(--cfg-text);
+      cursor: pointer;
+    }
+    .field select:focus {
+      border-color: var(--cfg-accent);
+    }
 
     .color-row {
       display: flex;
@@ -276,6 +292,15 @@
           </div>
         </div>
 
+        <div class="field">
+          <label for="viewSelect">Default View</label>
+          <select id="viewSelect">
+            <option value="week" selected>Week</option>
+            <option value="day">Day</option>
+            <option value="month">Month</option>
+          </select>
+        </div>
+
         <button class="btn-load" id="loadBtn">Load Calendar</button>
       </div>
 
@@ -310,6 +335,7 @@
     var cardHex     = document.getElementById("cardHex");
     var radiusSlider = document.getElementById("radiusSlider");
     var radiusVal   = document.getElementById("radiusVal");
+    var viewSelect  = document.getElementById("viewSelect");
     var loadBtn     = document.getElementById("loadBtn");
     var copyBtn     = document.getElementById("copyBtn");
     var snippetEl   = document.getElementById("snippetCode");
@@ -346,8 +372,11 @@
       var cc = val(cardHex, D.cardColor);
       var r = radiusSlider.value;
 
+      var vw = viewSelect.value;
+
       var attrs = 'data-web-calendar';
       if (url)                    attrs += ' data-url="' + escHtml(url) + '"';
+      if (!isDefault(vw, D.view))          attrs += ' data-view="' + escHtml(vw) + '"';
       if (!isDefault(accent, D.accent))     attrs += ' data-accent="' + escHtml(accent) + '"';
       if (!isDefault(bg, D.bg))             attrs += ' data-bg="' + escHtml(bg) + '"';
       if (!isDefault(tc, D.textColor))      attrs += ' data-text-color="' + escHtml(tc) + '"';
@@ -369,6 +398,7 @@
         textColor: val(textHex, D.textColor),
         cardColor: val(cardHex, D.cardColor),
         radius: radiusSlider.value,
+        view: viewSelect.value,
         noInput: true
       });
       updateSnippet();
@@ -405,6 +435,11 @@
     radiusSlider.addEventListener("input", function () {
       radiusVal.textContent = this.value + "px";
       if (cal) cal.setOption("radius", this.value);
+      updateSnippet();
+    });
+
+    viewSelect.addEventListener("change", function () {
+      if (cal) cal.setOption("view", this.value);
       updateSnippet();
     });
 
