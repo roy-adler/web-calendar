@@ -172,6 +172,51 @@
     }
     .btn-load:hover { opacity: 0.85; }
 
+    .import-field textarea {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      border: 1px solid var(--cfg-border);
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-family: "SF Mono", "Fira Code", Menlo, monospace;
+      outline: none;
+      transition: border-color 0.2s;
+      resize: vertical;
+      min-height: 60px;
+      line-height: 1.5;
+      color: var(--cfg-text);
+      background: var(--cfg-card);
+    }
+    .import-field textarea:focus { border-color: var(--cfg-accent); }
+    .import-field textarea::placeholder { font-family: inherit; font-size: 0.78rem; }
+    .btn-import {
+      width: 100%;
+      padding: 0.55rem;
+      background: transparent;
+      color: var(--cfg-accent);
+      border: 1px solid var(--cfg-accent);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      font-family: inherit;
+      margin-top: 0.5rem;
+    }
+    .btn-import:hover { background: var(--cfg-accent); color: #fff; }
+    .import-ok {
+      color: #38a169;
+      font-size: 0.8rem;
+      margin-top: 0.35rem;
+      display: none;
+    }
+    .import-err {
+      color: #e53e3e;
+      font-size: 0.8rem;
+      margin-top: 0.35rem;
+      display: none;
+    }
+
     /* ---- Preview area ---- */
     .preview-area h2 {
       font-size: 1rem;
@@ -244,6 +289,16 @@
       <!-- Settings panel -->
       <div class="settings">
         <h2>Settings</h2>
+
+        <div class="field import-field">
+          <label for="importSnippet">Import Existing Snippet</label>
+          <textarea id="importSnippet" rows="3" placeholder='Paste an embed snippet here, e.g. &lt;div data-web-calendar data-url="..." ...&gt;&lt;/div&gt;'></textarea>
+          <button class="btn-import" id="importBtn">Import Settings</button>
+          <div class="import-ok" id="importOk">Settings imported!</div>
+          <div class="import-err" id="importErr"></div>
+        </div>
+
+        <hr class="field-divider" />
 
         <div class="field">
           <label for="icsUrl">ICS Feed URL</label>
@@ -353,6 +408,11 @@
     var copyBtn     = document.getElementById("copyBtn");
     var snippetEl   = document.getElementById("snippetCode");
     var previewEl   = document.getElementById("preview");
+
+    var importArea  = document.getElementById("importSnippet");
+    var importBtn   = document.getElementById("importBtn");
+    var importOk    = document.getElementById("importOk");
+    var importErr   = document.getElementById("importErr");
 
     var D = WebCalendar.DEFAULTS;
     var cal = null;
@@ -477,6 +537,76 @@
         setTimeout(function () { copyBtn.textContent = "Copy"; }, 1500);
       });
     });
+
+    function flashImport(ok, msg) {
+      importOk.style.display = "none";
+      importErr.style.display = "none";
+      if (ok) {
+        importOk.textContent = msg || "Settings imported!";
+        importOk.style.display = "block";
+      } else {
+        importErr.textContent = msg || "Could not parse snippet.";
+        importErr.style.display = "block";
+      }
+      setTimeout(function () {
+        importOk.style.display = "none";
+        importErr.style.display = "none";
+      }, 3000);
+    }
+
+    function importSnippet() {
+      var raw = importArea.value.trim();
+      if (!raw) { flashImport(false, "Paste an embed snippet first."); return; }
+
+      var tmp = document.createElement("div");
+      tmp.innerHTML = raw;
+      var el = tmp.querySelector("[data-web-calendar]");
+      if (!el) {
+        flashImport(false, "No data-web-calendar element found in snippet.");
+        return;
+      }
+
+      var url = el.getAttribute("data-url") || "";
+      var accent = el.getAttribute("data-accent") || "";
+      var bg = el.getAttribute("data-bg") || "";
+      var textColor = el.getAttribute("data-text-color") || "";
+      var cardColor = el.getAttribute("data-card-color") || "";
+      var radius = el.getAttribute("data-radius");
+      var view = el.getAttribute("data-view") || "";
+      var lang = el.getAttribute("data-lang") || "";
+
+      if (url) icsInput.value = url;
+      if (accent && /^#[0-9a-f]{3,6}$/i.test(accent)) {
+        accentHex.value = accent; accentPick.value = accent;
+      }
+      if (bg && /^#[0-9a-f]{3,6}$/i.test(bg)) {
+        bgHex.value = bg; bgPick.value = bg;
+      }
+      if (textColor && /^#[0-9a-f]{3,6}$/i.test(textColor)) {
+        textHex.value = textColor; textPick.value = textColor;
+      }
+      if (cardColor && /^#[0-9a-f]{3,6}$/i.test(cardColor)) {
+        cardHex.value = cardColor; cardPick.value = cardColor;
+      }
+      if (radius != null && radius !== "") {
+        radiusSlider.value = radius;
+        radiusVal.textContent = radius + "px";
+      }
+      if (view && ["day","week","month","next"].indexOf(view) >= 0) {
+        viewSelect.value = view;
+      }
+      if (lang) {
+        for (var i = 0; i < langSelect.options.length; i++) {
+          if (langSelect.options[i].value === lang) { langSelect.value = lang; break; }
+        }
+      }
+
+      initPreview();
+      if (url) loadFeed();
+      flashImport(true);
+    }
+
+    importBtn.addEventListener("click", importSnippet);
 
     initPreview();
   </script>
