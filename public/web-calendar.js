@@ -188,6 +188,16 @@
     );
   }
 
+  function mix(base, blend, amount) {
+    var b = hexToRgb(base);
+    var m = hexToRgb(blend);
+    return rgbToHex(
+      Math.round(b[0] + (m[0] - b[0]) * amount),
+      Math.round(b[1] + (m[1] - b[1]) * amount),
+      Math.round(b[2] + (m[2] - b[2]) * amount)
+    );
+  }
+
   var DEFAULTS = {
     accent: "#4f6ef7",
     bg: "#f8f9fa",
@@ -196,28 +206,25 @@
     radius: "10"
   };
 
-  function applyAccent(el, accent) {
-    if (!accent) return;
+  function applyStyles(el, opts) {
     var s = el.style;
+    var accent = opts.accent || DEFAULTS.accent;
+    var card = opts.cardColor || DEFAULTS.cardColor;
+
     s.setProperty("--wc-accent", accent);
     s.setProperty("--wc-event-bg", accent);
-    s.setProperty("--wc-accent-light", tint(accent, 0.88));
-    s.setProperty("--wc-today-bg", tint(accent, 0.93));
-  }
+    s.setProperty("--wc-accent-light", mix(card, accent, 0.15));
+    s.setProperty("--wc-today-bg", mix(card, accent, 0.10));
 
-  function applyTheme(el, opts) {
-    var s = el.style;
-    if (opts.bg) {
-      s.setProperty("--wc-bg", opts.bg);
-    }
+    if (opts.bg) s.setProperty("--wc-bg", opts.bg);
     if (opts.textColor) {
       s.setProperty("--wc-text", opts.textColor);
       s.setProperty("color", opts.textColor);
       s.setProperty("--wc-text-light", tint(opts.textColor, 0.4));
     }
     if (opts.cardColor) {
-      s.setProperty("--wc-card", opts.cardColor);
-      s.setProperty("--wc-border", shade(opts.cardColor, 0.12));
+      s.setProperty("--wc-card", card);
+      s.setProperty("--wc-border", shade(card, 0.12));
     }
     if (opts.radius != null) {
       s.setProperty("--wc-radius", opts.radius + "px");
@@ -319,8 +326,7 @@
 
     injectStyles();
     this.el.classList.add("wc-container");
-    if (this.opts.accent) applyAccent(this.el, this.opts.accent);
-    applyTheme(this.el, this.opts);
+    applyStyles(this.el, this.opts);
 
     this._calDiv = document.createElement("div");
 
@@ -463,18 +469,12 @@
 
   WebCalendar.prototype.setAccent = function (color) {
     this.opts.accent = color;
-    applyAccent(this.el, color);
+    applyStyles(this.el, this.opts);
   };
 
   WebCalendar.prototype.setOption = function (key, value) {
     this.opts[key] = value;
-    if (key === "accent") {
-      applyAccent(this.el, value);
-    } else {
-      var patch = {};
-      patch[key] = value;
-      applyTheme(this.el, patch);
-    }
+    applyStyles(this.el, this.opts);
   };
 
   WebCalendar.DEFAULTS = DEFAULTS;
