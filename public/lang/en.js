@@ -1,0 +1,21 @@
+WebCalendar.registerLang("en", {
+  dow: ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
+  dowFull: ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+  months: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+  monthsFull: ["January","February","March","April","May","June","July","August","September","October","November","December"],
+  prev: "\u2039 Prev", today: "Today", next: "Next \u203a",
+  viewDay: "Day", viewWeek: "Week", viewMonth: "Month", viewNext: "Next",
+  upNext: "Up Next",
+  noEvents: "No events for this day",
+  noUpcoming: "No upcoming events",
+  noFeedEvents: "No events found in the calendar feed.",
+  enterUrl: "Enter an ICS feed URL and click Load.",
+  pasteUrl: "Paste an ICS feed URL above and hit Load.",
+  loading: "Loading\u2026",
+  loadFailed: "Failed to load feed: ",
+  load: "Load",
+  placeholder: "Paste an ICS feed URL here...",
+  happeningNow: "Happening now", startingNow: "Starting now", startsIn: "Starts in",
+  day: "day", days: "days", hr: "hr", hrs: "hrs", min: "min",
+  more: "more", of: "of", upcoming: "upcoming"
+});

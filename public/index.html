@@ -390,6 +390,11 @@
   </div>
 
   <script src="web-calendar.js"></script>
+  <script src="lang/en.js"></script>
+  <script src="lang/de.js"></script>
+  <script src="lang/fr.js"></script>
+  <script src="lang/it.js"></script>
+  <script src="lang/ru.js"></script>
   <script>
     var icsInput    = document.getElementById("icsUrl");
     var accentPick  = document.getElementById("accentPicker");
@@ -437,6 +442,13 @@
       return location.origin + "/web-calendar.js";
     }
 
+    function langSrc(lang) {
+      var host = location.hostname;
+      var base = (host === "localhost" || host === "127.0.0.1")
+        ? "https://your-server.com" : location.origin;
+      return base + "/lang/" + lang + ".js";
+    }
+
     function updateSnippet() {
       var url = icsInput.value.trim();
       var accent = val(accentHex, D.accent);
@@ -458,9 +470,12 @@
       if (!isDefault(cc, D.cardColor))      attrs += ' data-card-color="' + escHtml(cc) + '"';
       if (r !== D.radius)                   attrs += ' data-radius="' + escHtml(r) + '"';
 
+      var langTag = '\n&lt;script src="' + escHtml(langSrc(ln)) + '"&gt;&lt;/script&gt;';
+
       var snippet =
         '&lt;div ' + attrs + '&gt;&lt;/div&gt;\n' +
-        '&lt;script src="' + escHtml(scriptSrc()) + '"&gt;&lt;/script&gt;';
+        '&lt;script src="' + escHtml(scriptSrc()) + '"&gt;&lt;/script&gt;' +
+        langTag;
 
       snippetEl.innerHTML = snippet;
     }

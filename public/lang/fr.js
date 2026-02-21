@@ -1,0 +1,21 @@
+WebCalendar.registerLang("fr", {
+  dow: ["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"],
+  dowFull: ["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"],
+  months: ["Janv","F\u00e9vr","Mars","Avr","Mai","Juin","Juil","Ao\u00fbt","Sept","Oct","Nov","D\u00e9c"],
+  monthsFull: ["Janvier","F\u00e9vrier","Mars","Avril","Mai","Juin","Juillet","Ao\u00fbt","Septembre","Octobre","Novembre","D\u00e9cembre"],
+  prev: "\u2039 Pr\u00e9c", today: "Aujourd\u2019hui", next: "Suiv \u203a",
+  viewDay: "Jour", viewWeek: "Semaine", viewMonth: "Mois", viewNext: "Prochain",
+  upNext: "\u00c0 venir",
+  noEvents: "Aucun \u00e9v\u00e9nement ce jour",
+  noUpcoming: "Aucun \u00e9v\u00e9nement \u00e0 venir",
+  noFeedEvents: "Aucun \u00e9v\u00e9nement trouv\u00e9 dans le flux.",
+  enterUrl: "Entrez l\u2019URL du flux ICS et cliquez sur Charger.",
+  pasteUrl: "Collez l\u2019URL du flux ICS ci-dessus et appuyez sur Charger.",
+  loading: "Chargement\u2026",
+  loadFailed: "\u00c9chec du chargement : ",
+  load: "Charger",
+  placeholder: "Collez l\u2019URL d\u2019un flux ICS ici...",
+  happeningNow: "En cours", startingNow: "Commence maintenant", startsIn: "Commence dans",
+  day: "jour", days: "jours", hr: "h", hrs: "h", min: "min",
+  more: "de plus", of: "sur", upcoming: "\u00e0 venir"
+});

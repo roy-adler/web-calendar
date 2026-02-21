@@ -1,0 +1,21 @@
+WebCalendar.registerLang("it", {
+  dow: ["Lun","Mar","Mer","Gio","Ven","Sab","Dom"],
+  dowFull: ["Domenica","Luned\u00ec","Marted\u00ec","Mercoled\u00ec","Gioved\u00ec","Venerd\u00ec","Sabato"],
+  months: ["Gen","Feb","Mar","Apr","Mag","Giu","Lug","Ago","Set","Ott","Nov","Dic"],
+  monthsFull: ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"],
+  prev: "\u2039 Prec", today: "Oggi", next: "Succ \u203a",
+  viewDay: "Giorno", viewWeek: "Settimana", viewMonth: "Mese", viewNext: "Prossimo",
+  upNext: "Prossimo",
+  noEvents: "Nessun evento per questo giorno",
+  noUpcoming: "Nessun evento in programma",
+  noFeedEvents: "Nessun evento trovato nel feed.",
+  enterUrl: "Inserisci l\u2019URL del feed ICS e clicca Carica.",
+  pasteUrl: "Incolla l\u2019URL del feed ICS sopra e premi Carica.",
+  loading: "Caricamento\u2026",
+  loadFailed: "Caricamento feed fallito: ",
+  load: "Carica",
+  placeholder: "Incolla l\u2019URL di un feed ICS qui...",
+  happeningNow: "In corso", startingNow: "Inizia ora", startsIn: "Inizia tra",
+  day: "giorno", days: "giorni", hr: "ora", hrs: "ore", min: "min",
+  more: "altri", of: "di", upcoming: "in programma"
+});
