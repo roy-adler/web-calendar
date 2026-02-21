@@ -185,6 +185,12 @@
     s.setProperty("--wc-today-bg", tint(accent, 0.93));
   }
 
+  var SCRIPT_ORIGIN = (function () {
+    var s = document.currentScript;
+    if (!s || !s.src) return "";
+    try { return new URL(s.src).origin; } catch (e) { return ""; }
+  })();
+
   var DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
@@ -270,7 +276,7 @@
     this.opts = opts || {};
     this.events = [];
     this.weekOffset = 0;
-    this.server = this.opts.server || "";
+    this.server = this.opts.server || SCRIPT_ORIGIN || "";
 
     injectStyles();
     this.el.classList.add("wc-container");
@@ -425,22 +431,13 @@
 
   // ---- Auto-init from data attributes ----
   function autoInit() {
-    var script = document.currentScript ||
-      (function () {
-        var scripts = document.getElementsByTagName("script");
-        return scripts[scripts.length - 1];
-      })();
-
-    var server = script && script.getAttribute("data-server") || "";
-
     document.querySelectorAll("[data-web-calendar]").forEach(function (el) {
       if (el._webCalendar) return;
       var url = el.getAttribute("data-url") || "";
       var accent = el.getAttribute("data-accent") || "";
       el._webCalendar = new WebCalendar(el, {
         url: url || undefined,
-        accent: accent || undefined,
-        server: server || el.getAttribute("data-server") || ""
+        accent: accent || undefined
       });
     });
   }

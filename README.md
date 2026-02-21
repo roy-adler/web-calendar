@@ -30,14 +30,14 @@ Include `web-calendar.js` and add a `data-web-calendar` element. Use the configu
 
 ```html
 <div data-web-calendar data-url="https://example.com/feed.ics" data-accent="#e63946"></div>
-<script src="https://your-server.com/web-calendar.js" data-server="https://your-server.com"></script>
+<script src="https://your-server.com/web-calendar.js"></script>
 ```
 
 ### Without a URL (shows input field)
 
 ```html
 <div data-web-calendar></div>
-<script src="https://your-server.com/web-calendar.js" data-server="https://your-server.com"></script>
+<script src="https://your-server.com/web-calendar.js"></script>
 ```
 
 ### JavaScript API
@@ -48,8 +48,7 @@ Include `web-calendar.js` and add a `data-web-calendar` element. Use the configu
 <script>
   new WebCalendar('#my-calendar', {
     url: 'https://example.com/feed.ics',
-    accent: '#e63946',
-    server: 'https://your-server.com'
+    accent: '#e63946'
   });
 </script>
 ```
@@ -60,11 +59,10 @@ Include `web-calendar.js` and add a `data-web-calendar` element. Use the configu
 |---|---|
 | `data-url` / `url` | ICS feed URL. If provided, the calendar loads immediately with no input field. If omitted, an input field is shown. |
 | `data-accent` / `accent` | Accent hex color (e.g. `#e63946`). Drives event badges, today highlight, and buttons. Defaults to `#4f6ef7`. |
-| `data-server` / `server` | Base URL of the server running the `/api/feed` proxy (needed to avoid CORS). Can be set on the `<script>` tag or on each element. |
 
 ### Proxy server
 
-The widget fetches ICS feeds through the `/api/feed` proxy endpoint to avoid browser CORS restrictions. When embedding on an external site, set `data-server` to the URL where this app is hosted.
+The widget fetches ICS feeds through the `/api/feed` proxy endpoint to avoid browser CORS restrictions. The server URL is auto-detected from the script tag's `src` attribute, so no extra configuration is needed.
 
 ## How It Works
 

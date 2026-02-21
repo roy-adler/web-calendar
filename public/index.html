@@ -219,11 +219,6 @@
           </div>
         </div>
 
-        <div class="field">
-          <label for="serverUrl">Server URL</label>
-          <input id="serverUrl" type="text" placeholder="https://your-server.com" />
-        </div>
-
         <button class="btn-load" id="loadBtn">Load Calendar</button>
       </div>
 
@@ -250,7 +245,6 @@
     var icsInput   = document.getElementById("icsUrl");
     var accentPick = document.getElementById("accentPicker");
     var accentHex  = document.getElementById("accentHex");
-    var serverInput= document.getElementById("serverUrl");
     var loadBtn    = document.getElementById("loadBtn");
     var copyBtn    = document.getElementById("copyBtn");
     var snippetEl  = document.getElementById("snippetCode");
@@ -273,21 +267,23 @@
       return c.toLowerCase() === DEFAULT_ACCENT.toLowerCase();
     }
 
+    function scriptSrc() {
+      var host = location.hostname;
+      if (host === "localhost" || host === "127.0.0.1") return "https://your-server.com/web-calendar.js";
+      return location.origin + "/web-calendar.js";
+    }
+
     function updateSnippet() {
       var url = icsInput.value.trim();
       var accent = currentAccent();
-      var server = serverInput.value.trim();
 
       var attrs = 'data-web-calendar';
       if (url)    attrs += ' data-url="' + escHtml(url) + '"';
       if (!isDefaultAccent(accent)) attrs += ' data-accent="' + escHtml(accent) + '"';
 
-      var serverAttr = server ? ' data-server="' + escHtml(server) + '"' : '';
-
       var snippet =
         '&lt;div ' + attrs + '&gt;&lt;/div&gt;\n' +
-        '&lt;script src="' + escHtml(server || 'https://your-server.com') +
-        '/web-calendar.js"' + serverAttr + '&gt;&lt;/script&gt;';
+        '&lt;script src="' + escHtml(scriptSrc()) + '"&gt;&lt;/script&gt;';
 
       snippetEl.innerHTML = snippet;
     }
@@ -306,7 +302,6 @@
       updateSnippet();
     }
 
-    // Color sync
     accentPick.addEventListener("input", function () {
       accentHex.value = this.value;
       if (cal) cal.setAccent(this.value);
@@ -322,7 +317,6 @@
     });
 
     icsInput.addEventListener("input", updateSnippet);
-    serverInput.addEventListener("input", updateSnippet);
     loadBtn.addEventListener("click", loadFeed);
     icsInput.addEventListener("keydown", function (e) {
       if (e.key === "Enter") loadFeed();
@@ -335,11 +329,6 @@
         setTimeout(function () { copyBtn.textContent = "Copy"; }, 1500);
       });
     });
-
-    // Auto-fill server URL from current location
-    if (location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
-      serverInput.value = location.origin;
-    }
 
     initPreview();
   </script>
