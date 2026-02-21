@@ -117,6 +117,29 @@
       flex: 1;
     }
 
+    .range-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .range-row input[type="range"] {
+      flex: 1;
+      accent-color: var(--cfg-accent);
+    }
+    .range-row .range-val {
+      font-size: 0.85rem;
+      font-weight: 500;
+      min-width: 3.2em;
+      text-align: right;
+      color: var(--cfg-muted);
+    }
+
+    .field-divider {
+      border: none;
+      border-top: 1px solid var(--cfg-border);
+      margin: 1.25rem 0;
+    }
+
     .btn-load {
       width: 100%;
       padding: 0.7rem;
@@ -219,6 +242,40 @@
           </div>
         </div>
 
+        <hr class="field-divider" />
+
+        <div class="field">
+          <label>Background Color</label>
+          <div class="color-row">
+            <input id="bgPicker" type="color" value="#f8f9fa" />
+            <input id="bgHex" type="text" value="#f8f9fa" maxlength="7" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Text Color</label>
+          <div class="color-row">
+            <input id="textPicker" type="color" value="#1a202c" />
+            <input id="textHex" type="text" value="#1a202c" maxlength="7" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Card Color</label>
+          <div class="color-row">
+            <input id="cardPicker" type="color" value="#ffffff" />
+            <input id="cardHex" type="text" value="#ffffff" maxlength="7" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Border Radius</label>
+          <div class="range-row">
+            <input id="radiusSlider" type="range" min="0" max="24" value="10" />
+            <span class="range-val" id="radiusVal">10px</span>
+          </div>
+        </div>
+
         <button class="btn-load" id="loadBtn">Load Calendar</button>
       </div>
 
@@ -242,15 +299,23 @@
 
   <script src="web-calendar.js"></script>
   <script>
-    var icsInput   = document.getElementById("icsUrl");
-    var accentPick = document.getElementById("accentPicker");
-    var accentHex  = document.getElementById("accentHex");
-    var loadBtn    = document.getElementById("loadBtn");
-    var copyBtn    = document.getElementById("copyBtn");
-    var snippetEl  = document.getElementById("snippetCode");
-    var previewEl  = document.getElementById("preview");
+    var icsInput    = document.getElementById("icsUrl");
+    var accentPick  = document.getElementById("accentPicker");
+    var accentHex   = document.getElementById("accentHex");
+    var bgPick      = document.getElementById("bgPicker");
+    var bgHex       = document.getElementById("bgHex");
+    var textPick    = document.getElementById("textPicker");
+    var textHex     = document.getElementById("textHex");
+    var cardPick    = document.getElementById("cardPicker");
+    var cardHex     = document.getElementById("cardHex");
+    var radiusSlider = document.getElementById("radiusSlider");
+    var radiusVal   = document.getElementById("radiusVal");
+    var loadBtn     = document.getElementById("loadBtn");
+    var copyBtn     = document.getElementById("copyBtn");
+    var snippetEl   = document.getElementById("snippetCode");
+    var previewEl   = document.getElementById("preview");
 
-    var DEFAULT_ACCENT = "#4f6ef7";
+    var D = WebCalendar.DEFAULTS;
     var cal = null;
 
     function escHtml(s) {
@@ -259,12 +324,12 @@
       return d.innerHTML;
     }
 
-    function currentAccent() {
-      return accentHex.value.trim() || DEFAULT_ACCENT;
+    function val(hexInput, def) {
+      return hexInput.value.trim() || def;
     }
 
-    function isDefaultAccent(c) {
-      return c.toLowerCase() === DEFAULT_ACCENT.toLowerCase();
+    function isDefault(v, def) {
+      return v.toLowerCase() === def.toLowerCase();
     }
 
     function scriptSrc() {
@@ -275,11 +340,19 @@
 
     function updateSnippet() {
       var url = icsInput.value.trim();
-      var accent = currentAccent();
+      var accent = val(accentHex, D.accent);
+      var bg = val(bgHex, D.bg);
+      var tc = val(textHex, D.textColor);
+      var cc = val(cardHex, D.cardColor);
+      var r = radiusSlider.value;
 
       var attrs = 'data-web-calendar';
-      if (url)    attrs += ' data-url="' + escHtml(url) + '"';
-      if (!isDefaultAccent(accent)) attrs += ' data-accent="' + escHtml(accent) + '"';
+      if (url)                    attrs += ' data-url="' + escHtml(url) + '"';
+      if (!isDefault(accent, D.accent))     attrs += ' data-accent="' + escHtml(accent) + '"';
+      if (!isDefault(bg, D.bg))             attrs += ' data-bg="' + escHtml(bg) + '"';
+      if (!isDefault(tc, D.textColor))      attrs += ' data-text-color="' + escHtml(tc) + '"';
+      if (!isDefault(cc, D.cardColor))      attrs += ' data-card-color="' + escHtml(cc) + '"';
+      if (r !== D.radius)                   attrs += ' data-radius="' + escHtml(r) + '"';
 
       var snippet =
         '&lt;div ' + attrs + '&gt;&lt;/div&gt;\n' +
@@ -290,8 +363,14 @@
 
     function initPreview() {
       previewEl.innerHTML = "";
-      var accent = currentAccent();
-      cal = new WebCalendar(previewEl, { accent: accent, noInput: true });
+      cal = new WebCalendar(previewEl, {
+        accent: val(accentHex, D.accent),
+        bg: val(bgHex, D.bg),
+        textColor: val(textHex, D.textColor),
+        cardColor: val(cardHex, D.cardColor),
+        radius: radiusSlider.value,
+        noInput: true
+      });
       updateSnippet();
     }
 
@@ -302,17 +381,30 @@
       updateSnippet();
     }
 
-    accentPick.addEventListener("input", function () {
-      accentHex.value = this.value;
-      if (cal) cal.setAccent(this.value);
-      updateSnippet();
-    });
-    accentHex.addEventListener("input", function () {
-      var v = this.value.trim();
-      if (/^#[0-9a-f]{6}$/i.test(v)) {
-        accentPick.value = v;
-        if (cal) cal.setAccent(v);
-      }
+    function bindColorPair(picker, hex, optionKey) {
+      picker.addEventListener("input", function () {
+        hex.value = this.value;
+        if (cal) cal.setOption(optionKey, this.value);
+        updateSnippet();
+      });
+      hex.addEventListener("input", function () {
+        var v = this.value.trim();
+        if (/^#[0-9a-f]{6}$/i.test(v)) {
+          picker.value = v;
+          if (cal) cal.setOption(optionKey, v);
+        }
+        updateSnippet();
+      });
+    }
+
+    bindColorPair(accentPick, accentHex, "accent");
+    bindColorPair(bgPick, bgHex, "bg");
+    bindColorPair(textPick, textHex, "textColor");
+    bindColorPair(cardPick, cardHex, "cardColor");
+
+    radiusSlider.addEventListener("input", function () {
+      radiusVal.textContent = this.value + "px";
+      if (cal) cal.setOption("radius", this.value);
       updateSnippet();
     });
 

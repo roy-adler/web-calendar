@@ -7,6 +7,9 @@
     .wc-container {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       color: #1a202c;
+      background: var(--wc-bg);
+      padding: 1.25rem;
+      border-radius: var(--wc-radius);
       --wc-bg: #f8f9fa;
       --wc-card: #ffffff;
       --wc-border: #e2e8f0;
@@ -176,6 +179,23 @@
     );
   }
 
+  function shade(hex, amount) {
+    var rgb = hexToRgb(hex);
+    return rgbToHex(
+      Math.round(rgb[0] * (1 - amount)),
+      Math.round(rgb[1] * (1 - amount)),
+      Math.round(rgb[2] * (1 - amount))
+    );
+  }
+
+  var DEFAULTS = {
+    accent: "#4f6ef7",
+    bg: "#f8f9fa",
+    textColor: "#1a202c",
+    cardColor: "#ffffff",
+    radius: "10"
+  };
+
   function applyAccent(el, accent) {
     if (!accent) return;
     var s = el.style;
@@ -183,6 +203,25 @@
     s.setProperty("--wc-event-bg", accent);
     s.setProperty("--wc-accent-light", tint(accent, 0.88));
     s.setProperty("--wc-today-bg", tint(accent, 0.93));
+  }
+
+  function applyTheme(el, opts) {
+    var s = el.style;
+    if (opts.bg) {
+      s.setProperty("--wc-bg", opts.bg);
+    }
+    if (opts.textColor) {
+      s.setProperty("--wc-text", opts.textColor);
+      s.setProperty("color", opts.textColor);
+      s.setProperty("--wc-text-light", tint(opts.textColor, 0.4));
+    }
+    if (opts.cardColor) {
+      s.setProperty("--wc-card", opts.cardColor);
+      s.setProperty("--wc-border", shade(opts.cardColor, 0.12));
+    }
+    if (opts.radius != null) {
+      s.setProperty("--wc-radius", opts.radius + "px");
+    }
   }
 
   var SCRIPT_ORIGIN = (function () {
@@ -281,6 +320,7 @@
     injectStyles();
     this.el.classList.add("wc-container");
     if (this.opts.accent) applyAccent(this.el, this.opts.accent);
+    applyTheme(this.el, this.opts);
 
     this._calDiv = document.createElement("div");
 
@@ -426,6 +466,19 @@
     applyAccent(this.el, color);
   };
 
+  WebCalendar.prototype.setOption = function (key, value) {
+    this.opts[key] = value;
+    if (key === "accent") {
+      applyAccent(this.el, value);
+    } else {
+      var patch = {};
+      patch[key] = value;
+      applyTheme(this.el, patch);
+    }
+  };
+
+  WebCalendar.DEFAULTS = DEFAULTS;
+
   // ---- Public API ----
   window.WebCalendar = WebCalendar;
 
@@ -435,9 +488,17 @@
       if (el._webCalendar) return;
       var url = el.getAttribute("data-url") || "";
       var accent = el.getAttribute("data-accent") || "";
+      var bg = el.getAttribute("data-bg") || "";
+      var textColor = el.getAttribute("data-text-color") || "";
+      var cardColor = el.getAttribute("data-card-color") || "";
+      var radius = el.getAttribute("data-radius");
       el._webCalendar = new WebCalendar(el, {
         url: url || undefined,
-        accent: accent || undefined
+        accent: accent || undefined,
+        bg: bg || undefined,
+        textColor: textColor || undefined,
+        cardColor: cardColor || undefined,
+        radius: radius != null ? radius : undefined
       });
     });
   }
