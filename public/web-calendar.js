@@ -272,6 +272,62 @@
       .wc-month-day { min-height: 50px; }
       .wc-month-event { font-size: 0.6rem; }
     }
+    .wc-next-view {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem 0;
+    }
+    .wc-next-card {
+      background: var(--wc-card);
+      border: 1px solid var(--wc-border);
+      border-radius: var(--wc-radius);
+      padding: 1.5rem 2rem;
+      width: 100%;
+      max-width: 480px;
+      text-align: center;
+    }
+    .wc-next-when {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--wc-accent);
+      margin-bottom: 0.75rem;
+    }
+    .wc-next-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .wc-next-time {
+      font-size: 0.95rem;
+      color: var(--wc-text-light);
+      margin-bottom: 0.25rem;
+    }
+    .wc-next-location {
+      font-size: 0.85rem;
+      color: var(--wc-text-light);
+      font-style: italic;
+    }
+    .wc-next-desc {
+      font-size: 0.85rem;
+      color: var(--wc-text-light);
+      margin-top: 0.75rem;
+      line-height: 1.5;
+    }
+    .wc-next-countdown {
+      font-size: 0.85rem;
+      color: var(--wc-text-light);
+      margin-top: 1rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--wc-border);
+    }
+    .wc-next-position {
+      font-size: 0.8rem;
+      color: var(--wc-text-light);
+      margin-top: 0.75rem;
+    }
   `;
 
   function hexToRgb(hex) {
@@ -431,6 +487,17 @@
     return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   }
 
+  function formatCountdown(ms) {
+    if (ms <= 0) return "Happening now";
+    var mins = Math.floor(ms / 60000);
+    var hrs = Math.floor(mins / 60);
+    var days = Math.floor(hrs / 24);
+    if (days > 0) return "Starts in " + days + " day" + (days !== 1 ? "s" : "") + (hrs % 24 > 0 ? ", " + (hrs % 24) + " hr" : "");
+    if (hrs > 0) return "Starts in " + hrs + " hr" + (hrs !== 1 ? "s" : "") + (mins % 60 > 0 ? ", " + (mins % 60) + " min" : "");
+    if (mins > 0) return "Starts in " + mins + " min";
+    return "Starting now";
+  }
+
   function getDayStart(offset) {
     var d = new Date();
     d.setDate(d.getDate() + offset);
@@ -460,6 +527,7 @@
     this.weekOffset = 0;
     this.dayOffset = 0;
     this.monthOffset = 0;
+    this.nextOffset = 0;
     this.server = this.opts.server || SCRIPT_ORIGIN || "";
 
     injectStyles();
@@ -529,7 +597,7 @@
 
   WebCalendar.prototype._render = function () {
     var view = this.opts.view || "week";
-    var offset = view === "day" ? this.dayOffset : view === "month" ? this.monthOffset : this.weekOffset;
+    var offset = view === "day" ? this.dayOffset : view === "month" ? this.monthOffset : view === "next" ? this.nextOffset : this.weekOffset;
 
     if (this.events.length === 0 && offset === 0) {
       var msg = this.opts.url
@@ -543,6 +611,7 @@
 
     if (view === "day") this._renderDay();
     else if (view === "month") this._renderMonth();
+    else if (view === "next") this._renderNext();
     else this._renderWeek();
   };
 
@@ -557,6 +626,7 @@
           '<option value="day"' + (view === "day" ? " selected" : "") + '>Day</option>' +
           '<option value="week"' + (view === "week" ? " selected" : "") + '>Week</option>' +
           '<option value="month"' + (view === "month" ? " selected" : "") + '>Month</option>' +
+          '<option value="next"' + (view === "next" ? " selected" : "") + '>Next</option>' +
         '</select>' +
       '</div>' +
       '<div class="wc-label">' + label + '</div>' +
@@ -578,6 +648,10 @@
           if (action === "prev") self.monthOffset--;
           else if (action === "next") self.monthOffset++;
           else self.monthOffset = 0;
+        } else if (view === "next") {
+          if (action === "prev") { self.nextOffset--; if (self.nextOffset < 0) self.nextOffset = 0; }
+          else if (action === "next") self.nextOffset++;
+          else self.nextOffset = 0;
         } else {
           if (action === "prev") self.weekOffset--;
           else if (action === "next") self.weekOffset++;
@@ -727,6 +801,53 @@
         html += '<div class="wc-month-more">+' + (cellEvents.length - maxShow) + ' more</div>';
       }
       html += '</div></div>';
+    }
+
+    html += '</div>';
+    this._calDiv.innerHTML = html;
+    this._bindNavListeners();
+  };
+
+  WebCalendar.prototype._renderNext = function () {
+    var now = new Date();
+    var upcoming = this.events
+      .filter(function (e) { return e.dtstart >= now; })
+      .sort(function (a, b) { return a.dtstart - b.dtstart; });
+
+    var idx = this.nextOffset;
+    if (idx >= upcoming.length) idx = upcoming.length - 1;
+    if (idx < 0) idx = 0;
+    this.nextOffset = idx;
+
+    var label = "Up Next";
+    var html = this._navHtml(label) + '<div class="wc-next-view">';
+
+    if (upcoming.length === 0) {
+      html += '<div class="wc-day-empty">No upcoming events</div>';
+    } else {
+      var ev = upcoming[idx];
+      var dowNames = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+      var dateStr = dowNames[ev.dtstart.getDay()] + ", " +
+        MONTHS_FULL[ev.dtstart.getMonth()] + " " + ev.dtstart.getDate() + ", " + ev.dtstart.getFullYear();
+      var countdown = formatCountdown(ev.dtstart - now);
+
+      html += '<div class="wc-next-card">';
+      html += '<div class="wc-next-when">' + escapeHtml(dateStr) + '</div>';
+      html += '<div class="wc-next-title">' + escapeHtml(ev.summary) + '</div>';
+      if (ev.dtend) {
+        html += '<div class="wc-next-time">' + formatTime(ev.dtstart) + " \u2013 " + formatTime(ev.dtend) + '</div>';
+      }
+      if (ev.location) {
+        html += '<div class="wc-next-location">' + escapeHtml(ev.location) + '</div>';
+      }
+      if (ev.description) {
+        html += '<div class="wc-next-desc">' + escapeHtml(ev.description) + '</div>';
+      }
+      html += '<div class="wc-next-countdown">' + escapeHtml(countdown) + '</div>';
+      html += '</div>';
+      if (upcoming.length > 1) {
+        html += '<div class="wc-next-position">' + (idx + 1) + ' of ' + upcoming.length + ' upcoming</div>';
+      }
     }
 
     html += '</div>';
