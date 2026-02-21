@@ -375,7 +375,8 @@
     textColor: "#1a202c",
     cardColor: "#ffffff",
     radius: "10",
-    view: "week"
+    view: "week",
+    lang: "en"
   };
 
   function applyStyles(el, opts) {
@@ -412,6 +413,114 @@
   var DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   var MONTHS_FULL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+  var TRANSLATIONS = {
+    en: {
+      dow: ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
+      dowFull: ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+      months: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      monthsFull: ["January","February","March","April","May","June","July","August","September","October","November","December"],
+      prev: "\u2039 Prev", today: "Today", next: "Next \u203a",
+      viewDay: "Day", viewWeek: "Week", viewMonth: "Month", viewNext: "Next",
+      upNext: "Up Next",
+      noEvents: "No events for this day",
+      noUpcoming: "No upcoming events",
+      noFeedEvents: "No events found in the calendar feed.",
+      enterUrl: "Enter an ICS feed URL and click Load.",
+      pasteUrl: "Paste an ICS feed URL above and hit Load.",
+      loading: "Loading\u2026",
+      loadFailed: "Failed to load feed: ",
+      load: "Load",
+      placeholder: "Paste an ICS feed URL here...",
+      happeningNow: "Happening now", startingNow: "Starting now", startsIn: "Starts in",
+      day: "day", days: "days", hr: "hr", hrs: "hrs", min: "min",
+      more: "more", of: "of", upcoming: "upcoming"
+    },
+    de: {
+      dow: ["Mo","Di","Mi","Do","Fr","Sa","So"],
+      dowFull: ["Sonntag","Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"],
+      months: ["Jan","Feb","M\u00e4r","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"],
+      monthsFull: ["Januar","Februar","M\u00e4rz","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"],
+      prev: "\u2039 Zur\u00fcck", today: "Heute", next: "Weiter \u203a",
+      viewDay: "Tag", viewWeek: "Woche", viewMonth: "Monat", viewNext: "N\u00e4chster",
+      upNext: "Als N\u00e4chstes",
+      noEvents: "Keine Termine an diesem Tag",
+      noUpcoming: "Keine bevorstehenden Termine",
+      noFeedEvents: "Keine Termine im Kalender-Feed gefunden.",
+      enterUrl: "ICS-Feed-URL eingeben und auf Laden klicken.",
+      pasteUrl: "ICS-Feed-URL oben einf\u00fcgen und Laden dr\u00fccken.",
+      loading: "Wird geladen\u2026",
+      loadFailed: "Feed konnte nicht geladen werden: ",
+      load: "Laden",
+      placeholder: "ICS-Feed-URL hier einf\u00fcgen...",
+      happeningNow: "Findet gerade statt", startingNow: "Beginnt jetzt", startsIn: "Beginnt in",
+      day: "Tag", days: "Tagen", hr: "Std.", hrs: "Std.", min: "Min.",
+      more: "weitere", of: "von", upcoming: "bevorstehend"
+    },
+    fr: {
+      dow: ["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"],
+      dowFull: ["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"],
+      months: ["Janv","F\u00e9vr","Mars","Avr","Mai","Juin","Juil","Ao\u00fbt","Sept","Oct","Nov","D\u00e9c"],
+      monthsFull: ["Janvier","F\u00e9vrier","Mars","Avril","Mai","Juin","Juillet","Ao\u00fbt","Septembre","Octobre","Novembre","D\u00e9cembre"],
+      prev: "\u2039 Pr\u00e9c", today: "Aujourd\u2019hui", next: "Suiv \u203a",
+      viewDay: "Jour", viewWeek: "Semaine", viewMonth: "Mois", viewNext: "Prochain",
+      upNext: "\u00c0 venir",
+      noEvents: "Aucun \u00e9v\u00e9nement ce jour",
+      noUpcoming: "Aucun \u00e9v\u00e9nement \u00e0 venir",
+      noFeedEvents: "Aucun \u00e9v\u00e9nement trouv\u00e9 dans le flux.",
+      enterUrl: "Entrez l\u2019URL du flux ICS et cliquez sur Charger.",
+      pasteUrl: "Collez l\u2019URL du flux ICS ci-dessus et appuyez sur Charger.",
+      loading: "Chargement\u2026",
+      loadFailed: "\u00c9chec du chargement : ",
+      load: "Charger",
+      placeholder: "Collez l\u2019URL d\u2019un flux ICS ici...",
+      happeningNow: "En cours", startingNow: "Commence maintenant", startsIn: "Commence dans",
+      day: "jour", days: "jours", hr: "h", hrs: "h", min: "min",
+      more: "de plus", of: "sur", upcoming: "\u00e0 venir"
+    },
+    it: {
+      dow: ["Lun","Mar","Mer","Gio","Ven","Sab","Dom"],
+      dowFull: ["Domenica","Luned\u00ec","Marted\u00ec","Mercoled\u00ec","Gioved\u00ec","Venerd\u00ec","Sabato"],
+      months: ["Gen","Feb","Mar","Apr","Mag","Giu","Lug","Ago","Set","Ott","Nov","Dic"],
+      monthsFull: ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"],
+      prev: "\u2039 Prec", today: "Oggi", next: "Succ \u203a",
+      viewDay: "Giorno", viewWeek: "Settimana", viewMonth: "Mese", viewNext: "Prossimo",
+      upNext: "Prossimo",
+      noEvents: "Nessun evento per questo giorno",
+      noUpcoming: "Nessun evento in programma",
+      noFeedEvents: "Nessun evento trovato nel feed.",
+      enterUrl: "Inserisci l\u2019URL del feed ICS e clicca Carica.",
+      pasteUrl: "Incolla l\u2019URL del feed ICS sopra e premi Carica.",
+      loading: "Caricamento\u2026",
+      loadFailed: "Caricamento feed fallito: ",
+      load: "Carica",
+      placeholder: "Incolla l\u2019URL di un feed ICS qui...",
+      happeningNow: "In corso", startingNow: "Inizia ora", startsIn: "Inizia tra",
+      day: "giorno", days: "giorni", hr: "ora", hrs: "ore", min: "min",
+      more: "altri", of: "di", upcoming: "in programma"
+    },
+    ru: {
+      dow: ["\u041f\u043d","\u0412\u0442","\u0421\u0440","\u0427\u0442","\u041f\u0442","\u0421\u0431","\u0412\u0441"],
+      dowFull: ["\u0412\u043e\u0441\u043a\u0440\u0435\u0441\u0435\u043d\u044c\u0435","\u041f\u043e\u043d\u0435\u0434\u0435\u043b\u044c\u043d\u0438\u043a","\u0412\u0442\u043e\u0440\u043d\u0438\u043a","\u0421\u0440\u0435\u0434\u0430","\u0427\u0435\u0442\u0432\u0435\u0440\u0433","\u041f\u044f\u0442\u043d\u0438\u0446\u0430","\u0421\u0443\u0431\u0431\u043e\u0442\u0430"],
+      months: ["\u042f\u043d\u0432","\u0424\u0435\u0432","\u041c\u0430\u0440","\u0410\u043f\u0440","\u041c\u0430\u0439","\u0418\u044e\u043d","\u0418\u044e\u043b","\u0410\u0432\u0433","\u0421\u0435\u043d","\u041e\u043a\u0442","\u041d\u043e\u044f","\u0414\u0435\u043a"],
+      monthsFull: ["\u042f\u043d\u0432\u0430\u0440\u044c","\u0424\u0435\u0432\u0440\u0430\u043b\u044c","\u041c\u0430\u0440\u0442","\u0410\u043f\u0440\u0435\u043b\u044c","\u041c\u0430\u0439","\u0418\u044e\u043d\u044c","\u0418\u044e\u043b\u044c","\u0410\u0432\u0433\u0443\u0441\u0442","\u0421\u0435\u043d\u0442\u044f\u0431\u0440\u044c","\u041e\u043a\u0442\u044f\u0431\u0440\u044c","\u041d\u043e\u044f\u0431\u0440\u044c","\u0414\u0435\u043a\u0430\u0431\u0440\u044c"],
+      prev: "\u2039 \u041d\u0430\u0437\u0430\u0434", today: "\u0421\u0435\u0433\u043e\u0434\u043d\u044f", next: "\u0414\u0430\u043b\u0435\u0435 \u203a",
+      viewDay: "\u0414\u0435\u043d\u044c", viewWeek: "\u041d\u0435\u0434\u0435\u043b\u044f", viewMonth: "\u041c\u0435\u0441\u044f\u0446", viewNext: "\u0421\u043b\u0435\u0434\u0443\u044e\u0449\u0438\u0439",
+      upNext: "\u0414\u0430\u043b\u0435\u0435",
+      noEvents: "\u041d\u0435\u0442 \u0441\u043e\u0431\u044b\u0442\u0438\u0439 \u043d\u0430 \u044d\u0442\u043e\u0442 \u0434\u0435\u043d\u044c",
+      noUpcoming: "\u041d\u0435\u0442 \u043f\u0440\u0435\u0434\u0441\u0442\u043e\u044f\u0449\u0438\u0445 \u0441\u043e\u0431\u044b\u0442\u0438\u0439",
+      noFeedEvents: "\u0412 \u043b\u0435\u043d\u0442\u0435 \u043a\u0430\u043b\u0435\u043d\u0434\u0430\u0440\u044f \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u043e \u0441\u043e\u0431\u044b\u0442\u0438\u0439.",
+      enterUrl: "\u0412\u0432\u0435\u0434\u0438\u0442\u0435 URL ICS-\u043b\u0435\u043d\u0442\u044b \u0438 \u043d\u0430\u0436\u043c\u0438\u0442\u0435 \u0417\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044c.",
+      pasteUrl: "\u0412\u0441\u0442\u0430\u0432\u044c\u0442\u0435 URL ICS-\u043b\u0435\u043d\u0442\u044b \u0432\u044b\u0448\u0435 \u0438 \u043d\u0430\u0436\u043c\u0438\u0442\u0435 \u0417\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044c.",
+      loading: "\u0417\u0430\u0433\u0440\u0443\u0437\u043a\u0430\u2026",
+      loadFailed: "\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044c \u043b\u0435\u043d\u0442\u0443: ",
+      load: "\u0417\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044c",
+      placeholder: "\u0412\u0441\u0442\u0430\u0432\u044c\u0442\u0435 URL ICS-\u043b\u0435\u043d\u0442\u044b \u0437\u0434\u0435\u0441\u044c...",
+      happeningNow: "\u0421\u0435\u0439\u0447\u0430\u0441", startingNow: "\u041d\u0430\u0447\u0438\u043d\u0430\u0435\u0442\u0441\u044f", startsIn: "\u041d\u0430\u0447\u043d\u0451\u0442\u0441\u044f \u0447\u0435\u0440\u0435\u0437",
+      day: "\u0434\u0435\u043d\u044c", days: "\u0434\u043d.", hr: "\u0447.", hrs: "\u0447.", min: "\u043c\u0438\u043d.",
+      more: "\u0435\u0449\u0451", of: "\u0438\u0437", upcoming: "\u043f\u0440\u0435\u0434\u0441\u0442\u043e\u044f\u0449\u0438\u0445"
+    }
+  };
 
   function injectStyles() {
     if (STYLES_INJECTED) return;
@@ -487,15 +596,15 @@
     return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   }
 
-  function formatCountdown(ms) {
-    if (ms <= 0) return "Happening now";
+  function formatCountdown(ms, tr) {
+    if (ms <= 0) return tr.happeningNow;
     var mins = Math.floor(ms / 60000);
     var hrs = Math.floor(mins / 60);
     var days = Math.floor(hrs / 24);
-    if (days > 0) return "Starts in " + days + " day" + (days !== 1 ? "s" : "") + (hrs % 24 > 0 ? ", " + (hrs % 24) + " hr" : "");
-    if (hrs > 0) return "Starts in " + hrs + " hr" + (hrs !== 1 ? "s" : "") + (mins % 60 > 0 ? ", " + (mins % 60) + " min" : "");
-    if (mins > 0) return "Starts in " + mins + " min";
-    return "Starting now";
+    if (days > 0) return tr.startsIn + " " + days + " " + (days !== 1 ? tr.days : tr.day) + (hrs % 24 > 0 ? ", " + (hrs % 24) + " " + tr.hr : "");
+    if (hrs > 0) return tr.startsIn + " " + hrs + " " + (hrs !== 1 ? tr.hrs : tr.hr) + (mins % 60 > 0 ? ", " + (mins % 60) + " " + tr.min : "");
+    if (mins > 0) return tr.startsIn + " " + mins + " " + tr.min;
+    return tr.startingNow;
   }
 
   function getDayStart(offset) {
@@ -549,17 +658,22 @@
     }
   }
 
+  WebCalendar.prototype._tr = function () {
+    return TRANSLATIONS[this.opts.lang] || TRANSLATIONS.en;
+  };
+
   WebCalendar.prototype._buildFeedBar = function () {
     var self = this;
+    var tr = this._tr();
     var bar = document.createElement("div");
     bar.className = "wc-feed-bar";
 
     var input = document.createElement("input");
     input.type = "url";
-    input.placeholder = "Paste an ICS feed URL here...";
+    input.placeholder = tr.placeholder;
 
     var btn = document.createElement("button");
-    btn.textContent = "Load";
+    btn.textContent = tr.load;
 
     btn.addEventListener("click", function () { self.loadFeed(input.value.trim()); });
     input.addEventListener("keydown", function (e) {
@@ -576,7 +690,8 @@
     var self = this;
     var proxyUrl = this.server + "/api/feed?url=" + encodeURIComponent(url);
 
-    this._calDiv.innerHTML = '<div class="wc-status">Loading…</div>';
+    var tr = this._tr();
+    this._calDiv.innerHTML = '<div class="wc-status">' + tr.loading + '</div>';
 
     fetch(proxyUrl)
       .then(function (res) {
@@ -590,7 +705,7 @@
       })
       .catch(function (err) {
         self._calDiv.innerHTML =
-          '<div class="wc-status wc-error">Failed to load feed: ' +
+          '<div class="wc-status wc-error">' + self._tr().loadFailed +
           escapeHtml(err.message) + "</div>";
       });
   };
@@ -600,11 +715,12 @@
     var offset = view === "day" ? this.dayOffset : view === "month" ? this.monthOffset : view === "next" ? this.nextOffset : this.weekOffset;
 
     if (this.events.length === 0 && offset === 0) {
+      var tr = this._tr();
       var msg = this.opts.url
-        ? "No events found in the calendar feed."
+        ? tr.noFeedEvents
         : this.opts.noInput
-          ? "Enter an ICS feed URL and click Load."
-          : "Paste an ICS feed URL above and hit Load.";
+          ? tr.enterUrl
+          : tr.pasteUrl;
       this._calDiv.innerHTML = '<div class="wc-empty-state">' + msg + '</div>';
       return;
     }
@@ -617,16 +733,17 @@
 
   WebCalendar.prototype._navHtml = function (label) {
     var view = this.opts.view || "week";
+    var tr = this._tr();
     return '<div class="wc-week-nav">' +
       '<div class="wc-btns">' +
-        '<button data-wc-nav="prev">\u2039 Prev</button>' +
-        '<button data-wc-nav="today">Today</button>' +
-        '<button data-wc-nav="next">Next \u203a</button>' +
+        '<button data-wc-nav="prev">' + tr.prev + '</button>' +
+        '<button data-wc-nav="today">' + tr.today + '</button>' +
+        '<button data-wc-nav="next">' + tr.next + '</button>' +
         '<select class="wc-view-select" data-wc-view>' +
-          '<option value="day"' + (view === "day" ? " selected" : "") + '>Day</option>' +
-          '<option value="week"' + (view === "week" ? " selected" : "") + '>Week</option>' +
-          '<option value="month"' + (view === "month" ? " selected" : "") + '>Month</option>' +
-          '<option value="next"' + (view === "next" ? " selected" : "") + '>Next</option>' +
+          '<option value="day"' + (view === "day" ? " selected" : "") + '>' + tr.viewDay + '</option>' +
+          '<option value="week"' + (view === "week" ? " selected" : "") + '>' + tr.viewWeek + '</option>' +
+          '<option value="month"' + (view === "month" ? " selected" : "") + '>' + tr.viewMonth + '</option>' +
+          '<option value="next"' + (view === "next" ? " selected" : "") + '>' + tr.viewNext + '</option>' +
         '</select>' +
       '</div>' +
       '<div class="wc-label">' + label + '</div>' +
@@ -671,11 +788,12 @@
   };
 
   WebCalendar.prototype._renderWeek = function () {
+    var tr = this._tr();
     var weekStart = getWeekStart(this.weekOffset);
     var weekEnd = new Date(weekStart);
     weekEnd.setDate(weekEnd.getDate() + 6);
-    var label = weekStart.getDate() + " " + MONTHS[weekStart.getMonth()] +
-      " \u2013 " + weekEnd.getDate() + " " + MONTHS[weekEnd.getMonth()] +
+    var label = weekStart.getDate() + " " + tr.months[weekStart.getMonth()] +
+      " \u2013 " + weekEnd.getDate() + " " + tr.months[weekEnd.getMonth()] +
       " " + weekEnd.getFullYear();
 
     var today = new Date();
@@ -693,7 +811,7 @@
 
       html += '<div class="wc-day-col' + (isToday ? " wc-today" : "") + '">';
       html += '<div class="wc-day-header">';
-      html += '<div class="wc-dow">' + DOW[i] + '</div>';
+      html += '<div class="wc-dow">' + tr.dow[i] + '</div>';
       html += '<div class="wc-date">' + day.getDate() + '</div>';
       html += '</div><div class="wc-day-events">';
 
@@ -720,10 +838,10 @@
   };
 
   WebCalendar.prototype._renderDay = function () {
+    var tr = this._tr();
     var day = getDayStart(this.dayOffset);
-    var dowNames = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-    var label = dowNames[day.getDay()] + ", " +
-      MONTHS_FULL[day.getMonth()] + " " + day.getDate() + ", " + day.getFullYear();
+    var label = tr.dowFull[day.getDay()] + ", " +
+      tr.monthsFull[day.getMonth()] + " " + day.getDate() + ", " + day.getFullYear();
 
     var dayEvents = this.events
       .filter(function (e) { return isSameDay(e.dtstart, day); })
@@ -732,7 +850,7 @@
     var html = this._navHtml(label) + '<div class="wc-day-view">';
 
     if (dayEvents.length === 0) {
-      html += '<div class="wc-day-empty">No events for this day</div>';
+      html += '<div class="wc-day-empty">' + tr.noEvents + '</div>';
     } else {
       for (var i = 0; i < dayEvents.length; i++) {
         var ev = dayEvents[i];
@@ -758,15 +876,16 @@
   };
 
   WebCalendar.prototype._renderMonth = function () {
+    var tr = this._tr();
     var md = getMonthData(this.monthOffset);
-    var label = MONTHS_FULL[md.month] + " " + md.year;
+    var label = tr.monthsFull[md.month] + " " + md.year;
     var today = new Date();
     today.setHours(0, 0, 0, 0);
 
     var html = this._navHtml(label) + '<div class="wc-month-grid">';
 
     for (var d = 0; d < 7; d++) {
-      html += '<div class="wc-month-dow">' + DOW[d] + '</div>';
+      html += '<div class="wc-month-dow">' + tr.dow[d] + '</div>';
     }
 
     var startDate = new Date(md.year, md.month, 1);
@@ -798,7 +917,7 @@
         html += '<div class="wc-month-event">' + escapeHtml(cellEvents[j].summary) + '</div>';
       }
       if (cellEvents.length > maxShow) {
-        html += '<div class="wc-month-more">+' + (cellEvents.length - maxShow) + ' more</div>';
+        html += '<div class="wc-month-more">+' + (cellEvents.length - maxShow) + ' ' + tr.more + '</div>';
       }
       html += '</div></div>';
     }
@@ -809,6 +928,7 @@
   };
 
   WebCalendar.prototype._renderNext = function () {
+    var tr = this._tr();
     var now = new Date();
     var upcoming = this.events
       .filter(function (e) { return e.dtstart >= now; })
@@ -819,17 +939,16 @@
     if (idx < 0) idx = 0;
     this.nextOffset = idx;
 
-    var label = "Up Next";
+    var label = tr.upNext;
     var html = this._navHtml(label) + '<div class="wc-next-view">';
 
     if (upcoming.length === 0) {
-      html += '<div class="wc-day-empty">No upcoming events</div>';
+      html += '<div class="wc-day-empty">' + tr.noUpcoming + '</div>';
     } else {
       var ev = upcoming[idx];
-      var dowNames = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-      var dateStr = dowNames[ev.dtstart.getDay()] + ", " +
-        MONTHS_FULL[ev.dtstart.getMonth()] + " " + ev.dtstart.getDate() + ", " + ev.dtstart.getFullYear();
-      var countdown = formatCountdown(ev.dtstart - now);
+      var dateStr = tr.dowFull[ev.dtstart.getDay()] + ", " +
+        tr.monthsFull[ev.dtstart.getMonth()] + " " + ev.dtstart.getDate() + ", " + ev.dtstart.getFullYear();
+      var countdown = formatCountdown(ev.dtstart - now, tr);
 
       html += '<div class="wc-next-card">';
       html += '<div class="wc-next-when">' + escapeHtml(dateStr) + '</div>';
@@ -846,7 +965,7 @@
       html += '<div class="wc-next-countdown">' + escapeHtml(countdown) + '</div>';
       html += '</div>';
       if (upcoming.length > 1) {
-        html += '<div class="wc-next-position">' + (idx + 1) + ' of ' + upcoming.length + ' upcoming</div>';
+        html += '<div class="wc-next-position">' + (idx + 1) + ' ' + tr.of + ' ' + upcoming.length + ' ' + tr.upcoming + '</div>';
       }
     }
 
@@ -862,7 +981,7 @@
 
   WebCalendar.prototype.setOption = function (key, value) {
     this.opts[key] = value;
-    if (key === "view") {
+    if (key === "view" || key === "lang") {
       this._render();
     } else {
       applyStyles(this.el, this.opts);
@@ -885,6 +1004,7 @@
       var cardColor = el.getAttribute("data-card-color") || "";
       var radius = el.getAttribute("data-radius");
       var view = el.getAttribute("data-view") || "";
+      var lang = el.getAttribute("data-lang") || "";
       el._webCalendar = new WebCalendar(el, {
         url: url || undefined,
         accent: accent || undefined,
@@ -892,7 +1012,8 @@
         textColor: textColor || undefined,
         cardColor: cardColor || undefined,
         radius: radius != null ? radius : undefined,
-        view: view || undefined
+        view: view || undefined,
+        lang: lang || undefined
       });
     });
   }

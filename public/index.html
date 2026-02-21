@@ -302,6 +302,17 @@
           </select>
         </div>
 
+        <div class="field">
+          <label for="langSelect">Language</label>
+          <select id="langSelect">
+            <option value="en" selected>English</option>
+            <option value="de">Deutsch</option>
+            <option value="fr">Fran&ccedil;ais</option>
+            <option value="it">Italiano</option>
+            <option value="ru">Русский</option>
+          </select>
+        </div>
+
         <button class="btn-load" id="loadBtn">Load Calendar</button>
       </div>
 
@@ -337,6 +348,7 @@
     var radiusSlider = document.getElementById("radiusSlider");
     var radiusVal   = document.getElementById("radiusVal");
     var viewSelect  = document.getElementById("viewSelect");
+    var langSelect  = document.getElementById("langSelect");
     var loadBtn     = document.getElementById("loadBtn");
     var copyBtn     = document.getElementById("copyBtn");
     var snippetEl   = document.getElementById("snippetCode");
@@ -374,10 +386,12 @@
       var r = radiusSlider.value;
 
       var vw = viewSelect.value;
+      var ln = langSelect.value;
 
       var attrs = 'data-web-calendar';
       if (url)                    attrs += ' data-url="' + escHtml(url) + '"';
       if (!isDefault(vw, D.view))          attrs += ' data-view="' + escHtml(vw) + '"';
+      if (!isDefault(ln, D.lang))          attrs += ' data-lang="' + escHtml(ln) + '"';
       if (!isDefault(accent, D.accent))     attrs += ' data-accent="' + escHtml(accent) + '"';
       if (!isDefault(bg, D.bg))             attrs += ' data-bg="' + escHtml(bg) + '"';
       if (!isDefault(tc, D.textColor))      attrs += ' data-text-color="' + escHtml(tc) + '"';
@@ -400,6 +414,7 @@
         cardColor: val(cardHex, D.cardColor),
         radius: radiusSlider.value,
         view: viewSelect.value,
+        lang: langSelect.value,
         noInput: true
       });
       updateSnippet();
@@ -441,6 +456,11 @@
 
     viewSelect.addEventListener("change", function () {
       if (cal) cal.setOption("view", this.value);
+      updateSnippet();
+    });
+
+    langSelect.addEventListener("change", function () {
+      if (cal) cal.setOption("lang", this.value);
       updateSnippet();
     });
 
