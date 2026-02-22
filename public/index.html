@@ -426,6 +426,29 @@
           </select>
         </div>
 
+        <hr class="field-divider" />
+
+        <div class="field">
+          <label>Google Maps</label>
+          <div class="toggle-group">
+            <label class="toggle-row">
+              <input type="checkbox" id="showMaps" />
+              <span>Show Map for Locations</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="field" id="mapPosField" style="display:none">
+          <label for="mapPosSelect">Map Position</label>
+          <select id="mapPosSelect">
+            <option value="inline" selected>Inline (inside event card)</option>
+            <option value="above">Above events</option>
+            <option value="below">Below events</option>
+            <option value="left">Left side</option>
+            <option value="right">Right side</option>
+          </select>
+        </div>
+
         <button class="btn-load" id="loadBtn">Load Calendar</button>
       </div>
 
@@ -475,6 +498,9 @@
     var showLabelCb    = document.getElementById("showLabel");
     var labelPosSelect = document.getElementById("labelPosSelect");
     var labelPosField  = document.getElementById("labelPosField");
+    var showMapsCb     = document.getElementById("showMaps");
+    var mapPosSelect   = document.getElementById("mapPosSelect");
+    var mapPosField    = document.getElementById("mapPosField");
 
     var importArea  = document.getElementById("importSnippet");
     var importBtn   = document.getElementById("importBtn");
@@ -537,6 +563,8 @@
       if (!showViewSelCb.checked)           attrs += ' data-show-view-select="false"';
       if (!showLabelCb.checked)             attrs += ' data-show-label="false"';
       if (labelPosSelect.value !== D.labelPosition) attrs += ' data-label-position="' + escHtml(labelPosSelect.value) + '"';
+      if (showMapsCb.checked)                     attrs += ' data-show-maps="true"';
+      if (showMapsCb.checked && mapPosSelect.value !== D.mapPosition) attrs += ' data-map-position="' + escHtml(mapPosSelect.value) + '"';
 
       var langTag = '\n&lt;script src="' + escHtml(langSrc()) + '"&gt;&lt;/script&gt;';
 
@@ -564,7 +592,9 @@
         showNext: showNextCb.checked,
         showViewSelect: showViewSelCb.checked,
         showLabel: showLabelCb.checked,
-        labelPosition: labelPosSelect.value
+        labelPosition: labelPosSelect.value,
+        showMaps: showMapsCb.checked,
+        mapPosition: mapPosSelect.value
       });
       updateSnippet();
     }
@@ -638,6 +668,17 @@
 
     labelPosSelect.addEventListener("change", function () {
       if (cal) cal.setOption("labelPosition", this.value);
+      updateSnippet();
+    });
+
+    showMapsCb.addEventListener("change", function () {
+      if (cal) cal.setOption("showMaps", this.checked);
+      mapPosField.style.display = this.checked ? "" : "none";
+      updateSnippet();
+    });
+
+    mapPosSelect.addEventListener("change", function () {
+      if (cal) cal.setOption("mapPosition", this.value);
       updateSnippet();
     });
 
@@ -733,6 +774,12 @@
       showLabelCb.checked = sl !== "false";
       if (lp && (lp === "left" || lp === "right")) labelPosSelect.value = lp;
       labelPosField.style.display = showLabelCb.checked ? "" : "none";
+
+      var sm = el.getAttribute("data-show-maps");
+      var mp = el.getAttribute("data-map-position") || "";
+      showMapsCb.checked = sm === "true";
+      if (mp && ["inline","above","below","left","right"].indexOf(mp) >= 0) mapPosSelect.value = mp;
+      mapPosField.style.display = showMapsCb.checked ? "" : "none";
 
       initPreview();
       if (url) loadFeed();

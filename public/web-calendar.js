@@ -207,6 +207,53 @@
       margin-top: 0.25rem;
       line-height: 1.4;
     }
+    .wc-map-embed {
+      border: 1px solid var(--wc-border);
+      border-radius: var(--wc-radius);
+      overflow: hidden;
+    }
+    .wc-map-embed iframe {
+      display: block;
+      width: 100%;
+      height: 200px;
+      border: 0;
+    }
+    .wc-day-event-card .wc-map-embed {
+      margin-top: 0.5rem;
+    }
+    .wc-maps-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .wc-maps-section .wc-map-embed iframe {
+      height: 220px;
+    }
+    .wc-maps-section .wc-map-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--wc-text-light);
+      padding: 0.3rem 0.5rem 0;
+    }
+    .wc-day-layout-side {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      align-items: start;
+    }
+    .wc-day-layout-side .wc-day-events-col {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .wc-day-layout-side .wc-maps-section .wc-map-embed iframe {
+      height: 180px;
+    }
+    @media (max-width: 640px) {
+      .wc-day-layout-side {
+        grid-template-columns: 1fr;
+      }
+    }
     .wc-day-empty {
       text-align: center;
       color: var(--wc-text-light);
@@ -385,7 +432,9 @@
     showNext: true,
     showViewSelect: true,
     showLabel: true,
-    labelPosition: "right"
+    labelPosition: "right",
+    showMaps: false,
+    mapPosition: "inline"
   };
 
   function applyStyles(el, opts) {
@@ -750,6 +799,46 @@
     this._bindNavListeners();
   };
 
+  WebCalendar.prototype._mapIframe = function (location) {
+    var q = encodeURIComponent(location);
+    return '<div class="wc-map-embed">' +
+      '<iframe src="https://www.google.com/maps?q=' + q + '&output=embed" ' +
+      'loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>' +
+    '</div>';
+  };
+
+  WebCalendar.prototype._mapsSection = function (events) {
+    var located = events.filter(function (e) { return e.location; });
+    if (located.length === 0) return '';
+    var html = '<div class="wc-maps-section">';
+    for (var i = 0; i < located.length; i++) {
+      html += '<div class="wc-map-label">' + escapeHtml(located[i].summary) + ' \u2014 ' + escapeHtml(located[i].location) + '</div>';
+      html += this._mapIframe(located[i].location);
+    }
+    html += '</div>';
+    return html;
+  };
+
+  WebCalendar.prototype._dayEventCardHtml = function (ev, inlineMap) {
+    var html = '<div class="wc-day-event-card">';
+    if (ev.dtend) {
+      html += '<div class="wc-event-time">' + formatTime(ev.dtstart) +
+        " \u2013 " + formatTime(ev.dtend) + '</div>';
+    }
+    html += '<div class="wc-event-title">' + escapeHtml(ev.summary) + '</div>';
+    if (ev.location) {
+      html += '<div class="wc-event-location">' + escapeHtml(ev.location) + '</div>';
+    }
+    if (ev.description) {
+      html += '<div class="wc-event-desc">' + escapeHtml(ev.description) + '</div>';
+    }
+    if (inlineMap && ev.location) {
+      html += this._mapIframe(ev.location);
+    }
+    html += '</div>';
+    return html;
+  };
+
   WebCalendar.prototype._renderDay = function () {
     var tr = this._tr();
     var day = getDayStart(this.dayOffset);
@@ -760,30 +849,43 @@
       .filter(function (e) { return isSameDay(e.dtstart, day); })
       .sort(function (a, b) { return a.dtstart - b.dtstart; });
 
-    var html = this._navHtml(label) + '<div class="wc-day-view">';
+    var showMaps = this.opts.showMaps === true;
+    var pos = this.opts.mapPosition || "inline";
+    var isSide = pos === "left" || pos === "right";
+
+    var html = this._navHtml(label);
 
     if (dayEvents.length === 0) {
-      html += '<div class="wc-day-empty">' + tr.noEvents + '</div>';
-    } else {
+      html += '<div class="wc-day-view"><div class="wc-day-empty">' + tr.noEvents + '</div></div>';
+    } else if (showMaps && isSide) {
+      var eventsCol = '<div class="wc-day-events-col">';
       for (var i = 0; i < dayEvents.length; i++) {
-        var ev = dayEvents[i];
-        html += '<div class="wc-day-event-card">';
-        if (ev.dtend) {
-          html += '<div class="wc-event-time">' + formatTime(ev.dtstart) +
-            " \u2013 " + formatTime(ev.dtend) + '</div>';
-        }
-        html += '<div class="wc-event-title">' + escapeHtml(ev.summary) + '</div>';
-        if (ev.location) {
-          html += '<div class="wc-event-location">' + escapeHtml(ev.location) + '</div>';
-        }
-        if (ev.description) {
-          html += '<div class="wc-event-desc">' + escapeHtml(ev.description) + '</div>';
-        }
-        html += '</div>';
+        eventsCol += this._dayEventCardHtml(dayEvents[i], false);
       }
+      eventsCol += '</div>';
+      var mapsCol = this._mapsSection(dayEvents);
+
+      html += '<div class="wc-day-layout-side">';
+      if (pos === "left") {
+        html += mapsCol + eventsCol;
+      } else {
+        html += eventsCol + mapsCol;
+      }
+      html += '</div>';
+    } else {
+      var mapsHtml = showMaps && (pos === "above" || pos === "below") ? this._mapsSection(dayEvents) : '';
+
+      html += '<div class="wc-day-view">';
+      if (showMaps && pos === "above") html += mapsHtml;
+
+      for (var i = 0; i < dayEvents.length; i++) {
+        html += this._dayEventCardHtml(dayEvents[i], showMaps && pos === "inline");
+      }
+
+      if (showMaps && pos === "below") html += mapsHtml;
+      html += '</div>';
     }
 
-    html += '</div>';
     this._calDiv.innerHTML = html;
     this._bindNavListeners();
   };
@@ -840,6 +942,31 @@
     this._bindNavListeners();
   };
 
+  WebCalendar.prototype._nextCardHtml = function (ev, tr, now, inlineMap) {
+    var dateStr = tr.dowFull[ev.dtstart.getDay()] + ", " +
+      tr.monthsFull[ev.dtstart.getMonth()] + " " + ev.dtstart.getDate() + ", " + ev.dtstart.getFullYear();
+    var countdown = formatCountdown(ev.dtstart - now, tr);
+
+    var html = '<div class="wc-next-card">';
+    html += '<div class="wc-next-when">' + escapeHtml(dateStr) + '</div>';
+    html += '<div class="wc-next-title">' + escapeHtml(ev.summary) + '</div>';
+    if (ev.dtend) {
+      html += '<div class="wc-next-time">' + formatTime(ev.dtstart) + " \u2013 " + formatTime(ev.dtend) + '</div>';
+    }
+    if (ev.location) {
+      html += '<div class="wc-next-location">' + escapeHtml(ev.location) + '</div>';
+    }
+    if (ev.description) {
+      html += '<div class="wc-next-desc">' + escapeHtml(ev.description) + '</div>';
+    }
+    html += '<div class="wc-next-countdown">' + escapeHtml(countdown) + '</div>';
+    if (inlineMap && ev.location) {
+      html += '<div style="margin-top:0.75rem">' + this._mapIframe(ev.location) + '</div>';
+    }
+    html += '</div>';
+    return html;
+  };
+
   WebCalendar.prototype._renderNext = function () {
     var tr = this._tr();
     var now = new Date();
@@ -852,37 +979,51 @@
     if (idx < 0) idx = 0;
     this.nextOffset = idx;
 
+    var showMaps = this.opts.showMaps === true;
+    var pos = this.opts.mapPosition || "inline";
     var label = tr.upNext;
-    var html = this._navHtml(label) + '<div class="wc-next-view">';
+    var html = this._navHtml(label);
 
     if (upcoming.length === 0) {
-      html += '<div class="wc-day-empty">' + tr.noUpcoming + '</div>';
+      html += '<div class="wc-next-view"><div class="wc-day-empty">' + tr.noUpcoming + '</div></div>';
     } else {
       var ev = upcoming[idx];
-      var dateStr = tr.dowFull[ev.dtstart.getDay()] + ", " +
-        tr.monthsFull[ev.dtstart.getMonth()] + " " + ev.dtstart.getDate() + ", " + ev.dtstart.getFullYear();
-      var countdown = formatCountdown(ev.dtstart - now, tr);
+      var mapHtml = (showMaps && ev.location) ? this._mapIframe(ev.location) : '';
+      var isSide = pos === "left" || pos === "right";
 
-      html += '<div class="wc-next-card">';
-      html += '<div class="wc-next-when">' + escapeHtml(dateStr) + '</div>';
-      html += '<div class="wc-next-title">' + escapeHtml(ev.summary) + '</div>';
-      if (ev.dtend) {
-        html += '<div class="wc-next-time">' + formatTime(ev.dtstart) + " \u2013 " + formatTime(ev.dtend) + '</div>';
-      }
-      if (ev.location) {
-        html += '<div class="wc-next-location">' + escapeHtml(ev.location) + '</div>';
-      }
-      if (ev.description) {
-        html += '<div class="wc-next-desc">' + escapeHtml(ev.description) + '</div>';
-      }
-      html += '<div class="wc-next-countdown">' + escapeHtml(countdown) + '</div>';
-      html += '</div>';
-      if (upcoming.length > 1) {
-        html += '<div class="wc-next-position">' + (idx + 1) + ' ' + tr.of + ' ' + upcoming.length + ' ' + tr.upcoming + '</div>';
+      if (showMaps && ev.location && isSide) {
+        html += '<div class="wc-day-layout-side">';
+        var cardCol = '<div class="wc-next-view">' + this._nextCardHtml(ev, tr, now, false);
+        if (upcoming.length > 1) {
+          cardCol += '<div class="wc-next-position">' + (idx + 1) + ' ' + tr.of + ' ' + upcoming.length + ' ' + tr.upcoming + '</div>';
+        }
+        cardCol += '</div>';
+        var mapCol = '<div class="wc-maps-section">' + mapHtml + '</div>';
+
+        if (pos === "left") {
+          html += mapCol + cardCol;
+        } else {
+          html += cardCol + mapCol;
+        }
+        html += '</div>';
+      } else {
+        html += '<div class="wc-next-view">';
+        if (showMaps && ev.location && pos === "above") {
+          html += '<div class="wc-maps-section">' + mapHtml + '</div>';
+        }
+
+        html += this._nextCardHtml(ev, tr, now, showMaps && pos === "inline");
+
+        if (upcoming.length > 1) {
+          html += '<div class="wc-next-position">' + (idx + 1) + ' ' + tr.of + ' ' + upcoming.length + ' ' + tr.upcoming + '</div>';
+        }
+        if (showMaps && ev.location && pos === "below") {
+          html += '<div class="wc-maps-section">' + mapHtml + '</div>';
+        }
+        html += '</div>';
       }
     }
 
-    html += '</div>';
     this._calDiv.innerHTML = html;
     this._bindNavListeners();
   };
@@ -894,7 +1035,7 @@
 
   WebCalendar.prototype.setOption = function (key, value) {
     this.opts[key] = value;
-    if (key === "view" || key === "lang" || key === "showPrev" || key === "showToday" || key === "showNext" || key === "showViewSelect" || key === "showLabel" || key === "labelPosition") {
+    if (key === "view" || key === "lang" || key === "showPrev" || key === "showToday" || key === "showNext" || key === "showViewSelect" || key === "showLabel" || key === "labelPosition" || key === "showMaps" || key === "mapPosition") {
       this._render();
     } else {
       applyStyles(this.el, this.opts);
@@ -929,6 +1070,8 @@
       var showViewSelect = el.getAttribute("data-show-view-select");
       var showLabel = el.getAttribute("data-show-label");
       var labelPosition = el.getAttribute("data-label-position") || "";
+      var showMaps = el.getAttribute("data-show-maps");
+      var mapPosition = el.getAttribute("data-map-position") || "";
       el._webCalendar = new WebCalendar(el, {
         url: url || undefined,
         accent: accent || undefined,
@@ -943,7 +1086,9 @@
         showNext: showNext != null ? showNext !== "false" : undefined,
         showViewSelect: showViewSelect != null ? showViewSelect !== "false" : undefined,
         showLabel: showLabel != null ? showLabel !== "false" : undefined,
-        labelPosition: labelPosition || undefined
+        labelPosition: labelPosition || undefined,
+        showMaps: showMaps != null ? showMaps !== "false" : undefined,
+        mapPosition: mapPosition || undefined
       });
     });
   }
