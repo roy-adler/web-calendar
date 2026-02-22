@@ -22,7 +22,7 @@
       --wc-event-text: #ffffff;
       --wc-radius: 10px;
     }
-    .wc-container * { margin: 0; padding: 0; box-sizing: border-box; }
+    .wc-container * { margin: 0; padding: 0; box-sizing: border-box; word-break: normal; overflow-wrap: normal; hyphens: none; -webkit-hyphens: none; }
     .wc-feed-bar {
       display: flex;
       gap: 0.5rem;
@@ -427,6 +427,75 @@
       font-size: 0.8rem;
       color: var(--wc-text-light);
       margin-top: 0.75rem;
+    }
+    @media (max-width: 600px) {
+      .wc-container {
+        padding: 0.75rem;
+      }
+      .wc-week-nav {
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        justify-content: center;
+      }
+      .wc-week-nav .wc-btns {
+        flex-wrap: wrap;
+        gap: 0.3rem;
+        justify-content: center;
+        width: 100%;
+      }
+      .wc-week-nav .wc-label {
+        width: 100%;
+        text-align: center;
+        font-size: 0.95rem;
+        order: -1;
+      }
+      .wc-nav-reversed .wc-label {
+        text-align: center;
+      }
+      .wc-week-nav button {
+        padding: 0.35rem 0.6rem;
+        font-size: 0.8rem;
+        white-space: nowrap;
+      }
+      .wc-view-select {
+        padding: 0.35rem 0.45rem;
+        font-size: 0.8rem;
+        margin-left: 0;
+      }
+      .wc-next-card {
+        padding: 1rem;
+      }
+      .wc-next-title {
+        font-size: 1.1rem;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+      }
+      .wc-next-when {
+        font-size: 0.72rem;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+      }
+      .wc-next-time {
+        font-size: 0.85rem;
+      }
+      .wc-next-location {
+        font-size: 0.8rem;
+      }
+      .wc-next-countdown {
+        font-size: 0.8rem;
+      }
+      .wc-next-view {
+        padding: 0.5rem 0;
+      }
+      .wc-day-layout-side {
+        grid-template-columns: 1fr !important;
+      }
+      .wc-maps-section .wc-map-embed iframe {
+        height: 180px;
+      }
+      .wc-month-day { min-height: 50px; }
+      .wc-month-event { font-size: 0.6rem; }
+      .wc-month-dow { font-size: 0.6rem; padding: 0.35rem 0.15rem; }
     }
   `;
 
