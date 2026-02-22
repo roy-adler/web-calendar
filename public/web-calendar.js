@@ -239,15 +239,37 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 0.75rem;
-      align-items: start;
+      align-items: stretch;
     }
     .wc-day-layout-side .wc-day-events-col {
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
     }
+    .wc-day-layout-side .wc-next-view {
+      padding: 0;
+      align-items: stretch;
+    }
+    .wc-day-layout-side .wc-next-view .wc-next-card {
+      max-width: none;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .wc-day-layout-side .wc-maps-section {
+      display: flex;
+      flex-direction: column;
+      justify-content: stretch;
+    }
+    .wc-day-layout-side .wc-maps-section .wc-map-embed {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
     .wc-day-layout-side .wc-maps-section .wc-map-embed iframe {
-      height: 180px;
+      flex: 1;
+      min-height: 180px;
     }
     @media (max-width: 640px) {
       .wc-day-layout-side {
@@ -336,6 +358,9 @@
       width: 100%;
       max-width: 480px;
       text-align: center;
+    }
+    .wc-next-card.wc-next-full {
+      max-width: none;
     }
     .wc-next-when {
       font-size: 0.8rem;
@@ -434,7 +459,8 @@
     showLabel: true,
     labelPosition: "right",
     showMaps: false,
-    mapPosition: "inline"
+    mapPosition: "auto",
+    nextCardFull: false
   };
 
   function applyStyles(el, opts) {
@@ -799,6 +825,13 @@
     this._bindNavListeners();
   };
 
+  WebCalendar.prototype._resolveMapPos = function () {
+    var pos = this.opts.mapPosition || "auto";
+    if (pos !== "auto") return pos;
+    var w = this.el.offsetWidth || 0;
+    return w >= 600 ? "right" : "below";
+  };
+
   WebCalendar.prototype._mapIframe = function (location) {
     var q = encodeURIComponent(location);
     return '<div class="wc-map-embed">' +
@@ -850,7 +883,7 @@
       .sort(function (a, b) { return a.dtstart - b.dtstart; });
 
     var showMaps = this.opts.showMaps === true;
-    var pos = this.opts.mapPosition || "inline";
+    var pos = this._resolveMapPos();
     var isSide = pos === "left" || pos === "right";
 
     var html = this._navHtml(label);
@@ -946,8 +979,9 @@
     var dateStr = tr.dowFull[ev.dtstart.getDay()] + ", " +
       tr.monthsFull[ev.dtstart.getMonth()] + " " + ev.dtstart.getDate() + ", " + ev.dtstart.getFullYear();
     var countdown = formatCountdown(ev.dtstart - now, tr);
+    var fullClass = this.opts.nextCardFull ? ' wc-next-full' : '';
 
-    var html = '<div class="wc-next-card">';
+    var html = '<div class="wc-next-card' + fullClass + '">';
     html += '<div class="wc-next-when">' + escapeHtml(dateStr) + '</div>';
     html += '<div class="wc-next-title">' + escapeHtml(ev.summary) + '</div>';
     if (ev.dtend) {
@@ -980,7 +1014,7 @@
     this.nextOffset = idx;
 
     var showMaps = this.opts.showMaps === true;
-    var pos = this.opts.mapPosition || "inline";
+    var pos = this._resolveMapPos();
     var label = tr.upNext;
     var html = this._navHtml(label);
 
@@ -1035,7 +1069,7 @@
 
   WebCalendar.prototype.setOption = function (key, value) {
     this.opts[key] = value;
-    if (key === "view" || key === "lang" || key === "showPrev" || key === "showToday" || key === "showNext" || key === "showViewSelect" || key === "showLabel" || key === "labelPosition" || key === "showMaps" || key === "mapPosition") {
+    if (key === "view" || key === "lang" || key === "showPrev" || key === "showToday" || key === "showNext" || key === "showViewSelect" || key === "showLabel" || key === "labelPosition" || key === "showMaps" || key === "mapPosition" || key === "nextCardFull") {
       this._render();
     } else {
       applyStyles(this.el, this.opts);
@@ -1072,6 +1106,7 @@
       var labelPosition = el.getAttribute("data-label-position") || "";
       var showMaps = el.getAttribute("data-show-maps");
       var mapPosition = el.getAttribute("data-map-position") || "";
+      var nextCardFull = el.getAttribute("data-next-card-full");
       el._webCalendar = new WebCalendar(el, {
         url: url || undefined,
         accent: accent || undefined,
@@ -1088,7 +1123,8 @@
         showLabel: showLabel != null ? showLabel !== "false" : undefined,
         labelPosition: labelPosition || undefined,
         showMaps: showMaps != null ? showMaps !== "false" : undefined,
-        mapPosition: mapPosition || undefined
+        mapPosition: mapPosition || undefined,
+        nextCardFull: nextCardFull != null ? nextCardFull !== "false" : undefined
       });
     });
   }

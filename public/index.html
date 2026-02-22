@@ -441,12 +441,25 @@
         <div class="field" id="mapPosField" style="display:none">
           <label for="mapPosSelect">Map Position</label>
           <select id="mapPosSelect">
-            <option value="inline" selected>Inline (inside event card)</option>
+            <option value="auto" selected>Auto (adapts to space)</option>
+            <option value="inline">Inline (inside event card)</option>
             <option value="above">Above events</option>
             <option value="below">Below events</option>
             <option value="left">Left side</option>
             <option value="right">Right side</option>
           </select>
+        </div>
+
+        <hr class="field-divider" />
+
+        <div class="field">
+          <label>Next Event Card</label>
+          <div class="toggle-group">
+            <label class="toggle-row">
+              <input type="checkbox" id="nextCardFull" />
+              <span>Full Width Card</span>
+            </label>
+          </div>
         </div>
 
         <button class="btn-load" id="loadBtn">Load Calendar</button>
@@ -501,6 +514,7 @@
     var showMapsCb     = document.getElementById("showMaps");
     var mapPosSelect   = document.getElementById("mapPosSelect");
     var mapPosField    = document.getElementById("mapPosField");
+    var nextCardFullCb = document.getElementById("nextCardFull");
 
     var importArea  = document.getElementById("importSnippet");
     var importBtn   = document.getElementById("importBtn");
@@ -565,6 +579,7 @@
       if (labelPosSelect.value !== D.labelPosition) attrs += ' data-label-position="' + escHtml(labelPosSelect.value) + '"';
       if (showMapsCb.checked)                     attrs += ' data-show-maps="true"';
       if (showMapsCb.checked && mapPosSelect.value !== D.mapPosition) attrs += ' data-map-position="' + escHtml(mapPosSelect.value) + '"';
+      if (nextCardFullCb.checked)                attrs += ' data-next-card-full="true"';
 
       var langTag = '\n&lt;script src="' + escHtml(langSrc()) + '"&gt;&lt;/script&gt;';
 
@@ -594,7 +609,8 @@
         showLabel: showLabelCb.checked,
         labelPosition: labelPosSelect.value,
         showMaps: showMapsCb.checked,
-        mapPosition: mapPosSelect.value
+        mapPosition: mapPosSelect.value,
+        nextCardFull: nextCardFullCb.checked
       });
       updateSnippet();
     }
@@ -679,6 +695,11 @@
 
     mapPosSelect.addEventListener("change", function () {
       if (cal) cal.setOption("mapPosition", this.value);
+      updateSnippet();
+    });
+
+    nextCardFullCb.addEventListener("change", function () {
+      if (cal) cal.setOption("nextCardFull", this.checked);
       updateSnippet();
     });
 
@@ -778,8 +799,11 @@
       var sm = el.getAttribute("data-show-maps");
       var mp = el.getAttribute("data-map-position") || "";
       showMapsCb.checked = sm === "true";
-      if (mp && ["inline","above","below","left","right"].indexOf(mp) >= 0) mapPosSelect.value = mp;
+      if (mp && ["auto","inline","above","below","left","right"].indexOf(mp) >= 0) mapPosSelect.value = mp;
       mapPosField.style.display = showMapsCb.checked ? "" : "none";
+
+      var ncf = el.getAttribute("data-next-card-full");
+      nextCardFullCb.checked = ncf === "true";
 
       initPreview();
       if (url) loadFeed();
