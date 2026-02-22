@@ -491,9 +491,7 @@
         grid-template-columns: 1fr !important;
       }
       .wc-day-layout-side .wc-maps-section .wc-map-embed iframe {
-        min-height: auto;
-        height: auto;
-        aspect-ratio: 4 / 3;
+        min-height: 200px;
       }
       .wc-month-day { min-height: 50px; }
       .wc-month-event { font-size: 0.6rem; }
@@ -717,6 +715,11 @@
     this.el.classList.add("wc-container");
     applyStyles(this.el, this.opts);
 
+    var self = this;
+    window.addEventListener("resize", function () {
+      self._syncMapHeight();
+    });
+
     this._calDiv = document.createElement("div");
 
     if (this.opts.url) {
@@ -933,6 +936,24 @@
     return w >= 600 ? "right" : "below";
   };
 
+  WebCalendar.prototype._syncMapHeight = function () {
+    var w = this.el.offsetWidth || 0;
+    if (w >= 600) return;
+
+    var cardEl = this._calDiv.querySelector(".wc-next-card") || this._calDiv.querySelector(".wc-day-events-col");
+    var mapSection = this._calDiv.querySelector(".wc-maps-section");
+    if (!cardEl || !mapSection) return;
+
+    var iframe = mapSection.querySelector("iframe");
+    if (!iframe) return;
+
+    iframe.style.height = "";
+    var cardH = cardEl.offsetHeight;
+    if (cardH > 100) {
+      iframe.style.height = cardH + "px";
+    }
+  };
+
   WebCalendar.prototype._mapIframe = function (location) {
     var q = encodeURIComponent(location);
     var pinSvg = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
@@ -1026,6 +1047,8 @@
 
     this._calDiv.innerHTML = html;
     this._bindNavListeners();
+    var self = this;
+    setTimeout(function () { self._syncMapHeight(); }, 0);
   };
 
   WebCalendar.prototype._renderMonth = function () {
@@ -1171,6 +1194,8 @@
 
     this._calDiv.innerHTML = html;
     this._bindNavListeners();
+    var self = this;
+    setTimeout(function () { self._syncMapHeight(); }, 0);
   };
 
   WebCalendar.prototype.setAccent = function (color) {
