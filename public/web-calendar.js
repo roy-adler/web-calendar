@@ -376,7 +376,11 @@
     cardColor: "#ffffff",
     radius: "10",
     view: "week",
-    lang: "en"
+    lang: "en",
+    showPrev: true,
+    showToday: true,
+    showNext: true,
+    showViewSelect: true
   };
 
   function applyStyles(el, opts) {
@@ -624,18 +628,26 @@
   WebCalendar.prototype._navHtml = function (label) {
     var view = this.opts.view || "week";
     var tr = this._tr();
+    var showPrev = this.opts.showPrev !== false;
+    var showToday = this.opts.showToday !== false;
+    var showNext = this.opts.showNext !== false;
+    var showViewSelect = this.opts.showViewSelect !== false;
+
+    var btns = '';
+    if (showPrev) btns += '<button data-wc-nav="prev">' + tr.prev + '</button>';
+    if (showToday) btns += '<button data-wc-nav="today">' + tr.today + '</button>';
+    if (showNext) btns += '<button data-wc-nav="next">' + tr.next + '</button>';
+    if (showViewSelect) {
+      btns += '<select class="wc-view-select" data-wc-view>' +
+        '<option value="day"' + (view === "day" ? " selected" : "") + '>' + tr.viewDay + '</option>' +
+        '<option value="week"' + (view === "week" ? " selected" : "") + '>' + tr.viewWeek + '</option>' +
+        '<option value="month"' + (view === "month" ? " selected" : "") + '>' + tr.viewMonth + '</option>' +
+        '<option value="next"' + (view === "next" ? " selected" : "") + '>' + tr.viewNext + '</option>' +
+      '</select>';
+    }
+
     return '<div class="wc-week-nav">' +
-      '<div class="wc-btns">' +
-        '<button data-wc-nav="prev">' + tr.prev + '</button>' +
-        '<button data-wc-nav="today">' + tr.today + '</button>' +
-        '<button data-wc-nav="next">' + tr.next + '</button>' +
-        '<select class="wc-view-select" data-wc-view>' +
-          '<option value="day"' + (view === "day" ? " selected" : "") + '>' + tr.viewDay + '</option>' +
-          '<option value="week"' + (view === "week" ? " selected" : "") + '>' + tr.viewWeek + '</option>' +
-          '<option value="month"' + (view === "month" ? " selected" : "") + '>' + tr.viewMonth + '</option>' +
-          '<option value="next"' + (view === "next" ? " selected" : "") + '>' + tr.viewNext + '</option>' +
-        '</select>' +
-      '</div>' +
+      '<div class="wc-btns">' + btns + '</div>' +
       '<div class="wc-label">' + label + '</div>' +
     '</div>';
   };
@@ -871,7 +883,7 @@
 
   WebCalendar.prototype.setOption = function (key, value) {
     this.opts[key] = value;
-    if (key === "view" || key === "lang") {
+    if (key === "view" || key === "lang" || key === "showPrev" || key === "showToday" || key === "showNext" || key === "showViewSelect") {
       this._render();
     } else {
       applyStyles(this.el, this.opts);
@@ -900,6 +912,10 @@
       var radius = el.getAttribute("data-radius");
       var view = el.getAttribute("data-view") || "";
       var lang = el.getAttribute("data-lang") || "";
+      var showPrev = el.getAttribute("data-show-prev");
+      var showToday = el.getAttribute("data-show-today");
+      var showNext = el.getAttribute("data-show-next");
+      var showViewSelect = el.getAttribute("data-show-view-select");
       el._webCalendar = new WebCalendar(el, {
         url: url || undefined,
         accent: accent || undefined,
@@ -908,7 +924,11 @@
         cardColor: cardColor || undefined,
         radius: radius != null ? radius : undefined,
         view: view || undefined,
-        lang: lang || undefined
+        lang: lang || undefined,
+        showPrev: showPrev != null ? showPrev !== "false" : undefined,
+        showToday: showToday != null ? showToday !== "false" : undefined,
+        showNext: showNext != null ? showNext !== "false" : undefined,
+        showViewSelect: showViewSelect != null ? showViewSelect !== "false" : undefined
       });
     });
   }

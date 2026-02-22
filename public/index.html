@@ -156,6 +156,28 @@
       margin: 1.25rem 0;
     }
 
+    .toggle-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .toggle-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--cfg-accent);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .toggle-row span {
+      font-size: 0.88rem;
+      color: var(--cfg-text);
+    }
+
     .btn-load {
       width: 100%;
       padding: 0.7rem;
@@ -368,6 +390,30 @@
           </select>
         </div>
 
+        <hr class="field-divider" />
+
+        <div class="field">
+          <label>Visible Controls</label>
+          <div class="toggle-group">
+            <label class="toggle-row">
+              <input type="checkbox" id="showPrev" checked />
+              <span>Prev Button</span>
+            </label>
+            <label class="toggle-row">
+              <input type="checkbox" id="showToday" checked />
+              <span>Today Button</span>
+            </label>
+            <label class="toggle-row">
+              <input type="checkbox" id="showNext" checked />
+              <span>Next Button</span>
+            </label>
+            <label class="toggle-row">
+              <input type="checkbox" id="showViewSelect" checked />
+              <span>View Selector</span>
+            </label>
+          </div>
+        </div>
+
         <button class="btn-load" id="loadBtn">Load Calendar</button>
       </div>
 
@@ -409,6 +455,11 @@
     var copyBtn     = document.getElementById("copyBtn");
     var snippetEl   = document.getElementById("snippetCode");
     var previewEl   = document.getElementById("preview");
+
+    var showPrevCb     = document.getElementById("showPrev");
+    var showTodayCb    = document.getElementById("showToday");
+    var showNextCb     = document.getElementById("showNext");
+    var showViewSelCb  = document.getElementById("showViewSelect");
 
     var importArea  = document.getElementById("importSnippet");
     var importBtn   = document.getElementById("importBtn");
@@ -465,6 +516,10 @@
       if (!isDefault(tc, D.textColor))      attrs += ' data-text-color="' + escHtml(tc) + '"';
       if (!isDefault(cc, D.cardColor))      attrs += ' data-card-color="' + escHtml(cc) + '"';
       if (r !== D.radius)                   attrs += ' data-radius="' + escHtml(r) + '"';
+      if (!showPrevCb.checked)              attrs += ' data-show-prev="false"';
+      if (!showTodayCb.checked)             attrs += ' data-show-today="false"';
+      if (!showNextCb.checked)              attrs += ' data-show-next="false"';
+      if (!showViewSelCb.checked)           attrs += ' data-show-view-select="false"';
 
       var langTag = '\n&lt;script src="' + escHtml(langSrc()) + '"&gt;&lt;/script&gt;';
 
@@ -486,7 +541,11 @@
         radius: radiusSlider.value,
         view: viewSelect.value,
         lang: langSelect.value,
-        noInput: true
+        noInput: true,
+        showPrev: showPrevCb.checked,
+        showToday: showTodayCb.checked,
+        showNext: showNextCb.checked,
+        showViewSelect: showViewSelCb.checked
       });
       updateSnippet();
     }
@@ -540,6 +599,17 @@
       if (cal) cal.setOption("lang", this.value);
       updateSnippet();
     });
+
+    function bindToggle(cb, key) {
+      cb.addEventListener("change", function () {
+        if (cal) cal.setOption(key, this.checked);
+        updateSnippet();
+      });
+    }
+    bindToggle(showPrevCb, "showPrev");
+    bindToggle(showTodayCb, "showToday");
+    bindToggle(showNextCb, "showNext");
+    bindToggle(showViewSelCb, "showViewSelect");
 
     icsInput.addEventListener("input", updateSnippet);
     loadBtn.addEventListener("click", loadFeed);
@@ -618,6 +688,15 @@
           if (langSelect.options[i].value === lang) { langSelect.value = lang; break; }
         }
       }
+
+      var sp = el.getAttribute("data-show-prev");
+      var st = el.getAttribute("data-show-today");
+      var sn = el.getAttribute("data-show-next");
+      var sv = el.getAttribute("data-show-view-select");
+      showPrevCb.checked = sp !== "false";
+      showTodayCb.checked = st !== "false";
+      showNextCb.checked = sn !== "false";
+      showViewSelCb.checked = sv !== "false";
 
       initPreview();
       if (url) loadFeed();
