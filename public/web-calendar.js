@@ -980,7 +980,7 @@
     this._bindNavListeners();
   };
 
-  WebCalendar.prototype._nextCardHtml = function (ev, tr, now, inlineMap) {
+  WebCalendar.prototype._nextCardHtml = function (ev, tr, now, inlineMap, positionText) {
     var dateStr = tr.dowFull[ev.dtstart.getDay()] + ", " +
       tr.monthsFull[ev.dtstart.getMonth()] + " " + ev.dtstart.getDate() + ", " + ev.dtstart.getFullYear();
     var endMs = ev.dtend ? ev.dtend - now : null;
@@ -1000,6 +1000,9 @@
       html += '<div class="wc-next-desc">' + escapeHtml(ev.description) + '</div>';
     }
     html += '<div class="wc-next-countdown">' + escapeHtml(countdown) + '</div>';
+    if (positionText) {
+      html += '<div class="wc-next-position">' + positionText + '</div>';
+    }
     if (inlineMap && ev.location) {
       html += '<div style="margin-top:0.75rem">' + this._mapIframe(ev.location) + '</div>';
     }
@@ -1038,13 +1041,11 @@
       var mapHtml = (showMaps && ev.location) ? this._mapIframe(ev.location) : '';
       var isSide = pos === "left" || pos === "right";
 
+      var posText = allSorted.length > 1 ? (idx + 1) + ' ' + tr.of + ' ' + allSorted.length : '';
+
       if (showMaps && ev.location && isSide) {
         html += '<div class="wc-day-layout-side">';
-        var cardCol = '<div class="wc-next-view">' + this._nextCardHtml(ev, tr, now, false);
-        if (allSorted.length > 1) {
-          cardCol += '<div class="wc-next-position">' + (idx + 1) + ' ' + tr.of + ' ' + allSorted.length + '</div>';
-        }
-        cardCol += '</div>';
+        var cardCol = '<div class="wc-next-view">' + this._nextCardHtml(ev, tr, now, false, posText) + '</div>';
         var mapCol = '<div class="wc-maps-section">' + mapHtml + '</div>';
 
         if (pos === "left") {
@@ -1059,11 +1060,8 @@
           html += '<div class="wc-maps-section">' + mapHtml + '</div>';
         }
 
-        html += this._nextCardHtml(ev, tr, now, showMaps && pos === "inline");
+        html += this._nextCardHtml(ev, tr, now, showMaps && pos === "inline", posText);
 
-        if (allSorted.length > 1) {
-          html += '<div class="wc-next-position">' + (idx + 1) + ' ' + tr.of + ' ' + allSorted.length + '</div>';
-        }
         if (showMaps && ev.location && pos === "below") {
           html += '<div class="wc-maps-section">' + mapHtml + '</div>';
         }
