@@ -490,8 +490,10 @@
       .wc-day-layout-side {
         grid-template-columns: 1fr !important;
       }
-      .wc-maps-section .wc-map-embed iframe {
-        height: 180px;
+      .wc-day-layout-side .wc-maps-section .wc-map-embed iframe {
+        min-height: auto;
+        height: auto;
+        aspect-ratio: 4 / 3;
       }
       .wc-month-day { min-height: 50px; }
       .wc-month-event { font-size: 0.6rem; }
