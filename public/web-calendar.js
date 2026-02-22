@@ -207,16 +207,41 @@
       margin-top: 0.25rem;
       line-height: 1.4;
     }
+    @keyframes wc-shimmer {
+      0% { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
     .wc-map-embed {
       border: 1px solid var(--wc-border);
       border-radius: var(--wc-radius);
       overflow: hidden;
+      position: relative;
+      background: linear-gradient(90deg, var(--wc-card) 25%, var(--wc-border) 37%, var(--wc-card) 63%);
+      background-size: 800px 100%;
+      animation: wc-shimmer 1.5s infinite ease-in-out;
     }
     .wc-map-embed iframe {
       display: block;
       width: 100%;
       height: 200px;
       border: 0;
+      position: relative;
+      z-index: 1;
+    }
+    .wc-map-embed .wc-map-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      color: var(--wc-text-light);
+      font-size: 0.8rem;
+      pointer-events: none;
+    }
+    .wc-map-embed .wc-map-placeholder svg {
+      opacity: 0.3;
     }
     .wc-day-event-card .wc-map-embed {
       margin-top: 0.5rem;
@@ -839,7 +864,11 @@
 
   WebCalendar.prototype._mapIframe = function (location) {
     var q = encodeURIComponent(location);
+    var pinSvg = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+      '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+    var tr = this._tr();
     return '<div class="wc-map-embed">' +
+      '<div class="wc-map-placeholder">' + pinSvg + '<span>' + (tr.loadingMap || 'Loading map\u2026') + '</span></div>' +
       '<iframe src="https://www.google.com/maps?q=' + q + '&output=embed" ' +
       'loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>' +
     '</div>';
