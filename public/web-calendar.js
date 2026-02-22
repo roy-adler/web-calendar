@@ -612,6 +612,7 @@
     this.monthOffset = 0;
     this.nextOffset = 0;
     this.server = this.opts.server || SCRIPT_ORIGIN || "";
+    this._nextInitial = true;
 
     injectStyles();
     this.el.classList.add("wc-container");
@@ -675,6 +676,7 @@
       .then(function (text) {
         self.events = parseICS(text);
         self.weekOffset = 0;
+        self._nextInitial = true;
         self._render();
       })
       .catch(function (err) {
@@ -756,7 +758,7 @@
         } else if (view === "next") {
           if (action === "prev") { self.nextOffset--; if (self.nextOffset < 0) self.nextOffset = 0; }
           else if (action === "next") self.nextOffset++;
-          else self.nextOffset = 0;
+          else { self._nextInitial = true; }
         } else {
           if (action === "prev") self.weekOffset--;
           else if (action === "next") self.weekOffset++;
@@ -1004,12 +1006,19 @@
   WebCalendar.prototype._renderNext = function () {
     var tr = this._tr();
     var now = new Date();
-    var upcoming = this.events
-      .filter(function (e) { return e.dtstart >= now; })
-      .sort(function (a, b) { return a.dtstart - b.dtstart; });
+    var allSorted = this.events.slice().sort(function (a, b) { return a.dtstart - b.dtstart; });
+
+    if (this._nextInitial) {
+      var firstUpcoming = -1;
+      for (var i = 0; i < allSorted.length; i++) {
+        if (allSorted[i].dtstart >= now) { firstUpcoming = i; break; }
+      }
+      this.nextOffset = firstUpcoming >= 0 ? firstUpcoming : allSorted.length - 1;
+      this._nextInitial = false;
+    }
 
     var idx = this.nextOffset;
-    if (idx >= upcoming.length) idx = upcoming.length - 1;
+    if (idx >= allSorted.length) idx = allSorted.length - 1;
     if (idx < 0) idx = 0;
     this.nextOffset = idx;
 
@@ -1018,18 +1027,18 @@
     var label = tr.upNext;
     var html = this._navHtml(label);
 
-    if (upcoming.length === 0) {
+    if (allSorted.length === 0) {
       html += '<div class="wc-next-view"><div class="wc-day-empty">' + tr.noUpcoming + '</div></div>';
     } else {
-      var ev = upcoming[idx];
+      var ev = allSorted[idx];
       var mapHtml = (showMaps && ev.location) ? this._mapIframe(ev.location) : '';
       var isSide = pos === "left" || pos === "right";
 
       if (showMaps && ev.location && isSide) {
         html += '<div class="wc-day-layout-side">';
         var cardCol = '<div class="wc-next-view">' + this._nextCardHtml(ev, tr, now, false);
-        if (upcoming.length > 1) {
-          cardCol += '<div class="wc-next-position">' + (idx + 1) + ' ' + tr.of + ' ' + upcoming.length + ' ' + tr.upcoming + '</div>';
+        if (allSorted.length > 1) {
+          cardCol += '<div class="wc-next-position">' + (idx + 1) + ' ' + tr.of + ' ' + allSorted.length + '</div>';
         }
         cardCol += '</div>';
         var mapCol = '<div class="wc-maps-section">' + mapHtml + '</div>';
@@ -1048,8 +1057,8 @@
 
         html += this._nextCardHtml(ev, tr, now, showMaps && pos === "inline");
 
-        if (upcoming.length > 1) {
-          html += '<div class="wc-next-position">' + (idx + 1) + ' ' + tr.of + ' ' + upcoming.length + ' ' + tr.upcoming + '</div>';
+        if (allSorted.length > 1) {
+          html += '<div class="wc-next-position">' + (idx + 1) + ' ' + tr.of + ' ' + allSorted.length + '</div>';
         }
         if (showMaps && ev.location && pos === "below") {
           html += '<div class="wc-maps-section">' + mapHtml + '</div>';
