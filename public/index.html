@@ -589,6 +589,41 @@
         langTag;
 
       snippetEl.innerHTML = snippet;
+      updateUrl();
+    }
+
+    function updateUrl() {
+      var p = new URLSearchParams();
+      var url = icsInput.value.trim();
+      var accent = val(accentHex, D.accent);
+      var bg = val(bgHex, D.bg);
+      var tc = val(textHex, D.textColor);
+      var cc = val(cardHex, D.cardColor);
+      var r = radiusSlider.value;
+      var vw = viewSelect.value;
+      var ln = langSelect.value;
+
+      if (url) p.set("url", url);
+      if (!isDefault(vw, D.view)) p.set("view", vw);
+      if (!isDefault(ln, D.lang)) p.set("lang", ln);
+      if (!isDefault(accent, D.accent)) p.set("accent", accent);
+      if (!isDefault(bg, D.bg)) p.set("bg", bg);
+      if (!isDefault(tc, D.textColor)) p.set("textColor", tc);
+      if (!isDefault(cc, D.cardColor)) p.set("cardColor", cc);
+      if (r !== D.radius) p.set("radius", r);
+      if (!showPrevCb.checked) p.set("showPrev", "false");
+      if (!showTodayCb.checked) p.set("showToday", "false");
+      if (!showNextCb.checked) p.set("showNext", "false");
+      if (!showViewSelCb.checked) p.set("showViewSelect", "false");
+      if (!showLabelCb.checked) p.set("showLabel", "false");
+      if (labelPosSelect.value !== D.labelPosition) p.set("labelPosition", labelPosSelect.value);
+      if (showMapsCb.checked) p.set("showMaps", "true");
+      if (showMapsCb.checked && mapPosSelect.value !== D.mapPosition) p.set("mapPosition", mapPosSelect.value);
+      if (nextCardFullCb.checked) p.set("nextCardFull", "true");
+
+      var qs = p.toString();
+      var newUrl = location.pathname + (qs ? "?" + qs : "");
+      history.replaceState(null, "", newUrl);
     }
 
     function initPreview() {
@@ -811,6 +846,71 @@
     }
 
     importBtn.addEventListener("click", importSnippet);
+
+    (function loadFromUrl() {
+      var p = new URLSearchParams(location.search);
+      if (p.toString() === "") return;
+
+      var url = p.get("url");
+      var accent = p.get("accent");
+      var bg = p.get("bg");
+      var tc = p.get("textColor");
+      var cc = p.get("cardColor");
+      var r = p.get("radius");
+      var vw = p.get("view");
+      var ln = p.get("lang");
+
+      if (url) icsInput.value = url;
+      if (accent && /^#[0-9a-f]{3,6}$/i.test(accent)) {
+        accentHex.value = accent; accentPick.value = accent;
+        syncPageAccent(accent);
+      }
+      if (bg && /^#[0-9a-f]{3,6}$/i.test(bg)) {
+        bgHex.value = bg; bgPick.value = bg;
+      }
+      if (tc && /^#[0-9a-f]{3,6}$/i.test(tc)) {
+        textHex.value = tc; textPick.value = tc;
+      }
+      if (cc && /^#[0-9a-f]{3,6}$/i.test(cc)) {
+        cardHex.value = cc; cardPick.value = cc;
+      }
+      if (r != null && r !== "") {
+        radiusSlider.value = r;
+        radiusVal.textContent = r + "px";
+      }
+      if (vw && ["day","week","month","next"].indexOf(vw) >= 0) {
+        viewSelect.value = vw;
+      }
+      if (ln) {
+        for (var i = 0; i < langSelect.options.length; i++) {
+          if (langSelect.options[i].value === ln) { langSelect.value = ln; break; }
+        }
+      }
+
+      if (p.get("showPrev") === "false") showPrevCb.checked = false;
+      if (p.get("showToday") === "false") showTodayCb.checked = false;
+      if (p.get("showNext") === "false") showNextCb.checked = false;
+      if (p.get("showViewSelect") === "false") showViewSelCb.checked = false;
+
+      var sl = p.get("showLabel");
+      if (sl === "false") showLabelCb.checked = false;
+      var lp = p.get("labelPosition");
+      if (lp && (lp === "left" || lp === "right")) labelPosSelect.value = lp;
+      labelPosField.style.display = showLabelCb.checked ? "" : "none";
+
+      if (p.get("showMaps") === "true") showMapsCb.checked = true;
+      var mp = p.get("mapPosition");
+      if (mp && ["auto","inline","above","below","left","right"].indexOf(mp) >= 0) mapPosSelect.value = mp;
+      mapPosField.style.display = showMapsCb.checked ? "" : "none";
+
+      if (p.get("nextCardFull") === "true") nextCardFullCb.checked = true;
+
+      if (url) {
+        initPreview();
+        loadFeed();
+        return;
+      }
+    })();
 
     initPreview();
   </script>
