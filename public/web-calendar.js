@@ -82,6 +82,9 @@
       color: var(--wc-text);
     }
     .wc-week-nav button:hover { background: var(--wc-accent-light); }
+    .wc-nav-reversed { flex-direction: row-reverse; }
+    .wc-nav-reversed .wc-label { text-align: left; }
+    .wc-nav-reversed .wc-btns { justify-content: flex-end; }
     .wc-week-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
@@ -380,7 +383,9 @@
     showPrev: true,
     showToday: true,
     showNext: true,
-    showViewSelect: true
+    showViewSelect: true,
+    showLabel: true,
+    labelPosition: "right"
   };
 
   function applyStyles(el, opts) {
@@ -646,9 +651,15 @@
       '</select>';
     }
 
-    return '<div class="wc-week-nav">' +
+    var showLabel = this.opts.showLabel !== false;
+    var labelLeft = this.opts.labelPosition === "left";
+    var navClass = 'wc-week-nav' + (labelLeft ? ' wc-nav-reversed' : '');
+
+    var labelHtml = showLabel ? '<div class="wc-label">' + label + '</div>' : '';
+
+    return '<div class="' + navClass + '">' +
       '<div class="wc-btns">' + btns + '</div>' +
-      '<div class="wc-label">' + label + '</div>' +
+      labelHtml +
     '</div>';
   };
 
@@ -883,7 +894,7 @@
 
   WebCalendar.prototype.setOption = function (key, value) {
     this.opts[key] = value;
-    if (key === "view" || key === "lang" || key === "showPrev" || key === "showToday" || key === "showNext" || key === "showViewSelect") {
+    if (key === "view" || key === "lang" || key === "showPrev" || key === "showToday" || key === "showNext" || key === "showViewSelect" || key === "showLabel" || key === "labelPosition") {
       this._render();
     } else {
       applyStyles(this.el, this.opts);
@@ -916,6 +927,8 @@
       var showToday = el.getAttribute("data-show-today");
       var showNext = el.getAttribute("data-show-next");
       var showViewSelect = el.getAttribute("data-show-view-select");
+      var showLabel = el.getAttribute("data-show-label");
+      var labelPosition = el.getAttribute("data-label-position") || "";
       el._webCalendar = new WebCalendar(el, {
         url: url || undefined,
         accent: accent || undefined,
@@ -928,7 +941,9 @@
         showPrev: showPrev != null ? showPrev !== "false" : undefined,
         showToday: showToday != null ? showToday !== "false" : undefined,
         showNext: showNext != null ? showNext !== "false" : undefined,
-        showViewSelect: showViewSelect != null ? showViewSelect !== "false" : undefined
+        showViewSelect: showViewSelect != null ? showViewSelect !== "false" : undefined,
+        showLabel: showLabel != null ? showLabel !== "false" : undefined,
+        labelPosition: labelPosition || undefined
       });
     });
   }

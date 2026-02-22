@@ -411,7 +411,19 @@
               <input type="checkbox" id="showViewSelect" checked />
               <span>View Selector</span>
             </label>
+            <label class="toggle-row">
+              <input type="checkbox" id="showLabel" checked />
+              <span>Date Label</span>
+            </label>
           </div>
+        </div>
+
+        <div class="field" id="labelPosField">
+          <label for="labelPosSelect">Date Label Position</label>
+          <select id="labelPosSelect">
+            <option value="right" selected>Right</option>
+            <option value="left">Left</option>
+          </select>
         </div>
 
         <button class="btn-load" id="loadBtn">Load Calendar</button>
@@ -460,6 +472,9 @@
     var showTodayCb    = document.getElementById("showToday");
     var showNextCb     = document.getElementById("showNext");
     var showViewSelCb  = document.getElementById("showViewSelect");
+    var showLabelCb    = document.getElementById("showLabel");
+    var labelPosSelect = document.getElementById("labelPosSelect");
+    var labelPosField  = document.getElementById("labelPosField");
 
     var importArea  = document.getElementById("importSnippet");
     var importBtn   = document.getElementById("importBtn");
@@ -520,6 +535,8 @@
       if (!showTodayCb.checked)             attrs += ' data-show-today="false"';
       if (!showNextCb.checked)              attrs += ' data-show-next="false"';
       if (!showViewSelCb.checked)           attrs += ' data-show-view-select="false"';
+      if (!showLabelCb.checked)             attrs += ' data-show-label="false"';
+      if (labelPosSelect.value !== D.labelPosition) attrs += ' data-label-position="' + escHtml(labelPosSelect.value) + '"';
 
       var langTag = '\n&lt;script src="' + escHtml(langSrc()) + '"&gt;&lt;/script&gt;';
 
@@ -545,7 +562,9 @@
         showPrev: showPrevCb.checked,
         showToday: showTodayCb.checked,
         showNext: showNextCb.checked,
-        showViewSelect: showViewSelCb.checked
+        showViewSelect: showViewSelCb.checked,
+        showLabel: showLabelCb.checked,
+        labelPosition: labelPosSelect.value
       });
       updateSnippet();
     }
@@ -610,6 +629,17 @@
     bindToggle(showTodayCb, "showToday");
     bindToggle(showNextCb, "showNext");
     bindToggle(showViewSelCb, "showViewSelect");
+
+    showLabelCb.addEventListener("change", function () {
+      if (cal) cal.setOption("showLabel", this.checked);
+      labelPosField.style.display = this.checked ? "" : "none";
+      updateSnippet();
+    });
+
+    labelPosSelect.addEventListener("change", function () {
+      if (cal) cal.setOption("labelPosition", this.value);
+      updateSnippet();
+    });
 
     icsInput.addEventListener("input", updateSnippet);
     loadBtn.addEventListener("click", loadFeed);
@@ -697,6 +727,12 @@
       showTodayCb.checked = st !== "false";
       showNextCb.checked = sn !== "false";
       showViewSelCb.checked = sv !== "false";
+
+      var sl = el.getAttribute("data-show-label");
+      var lp = el.getAttribute("data-label-position") || "";
+      showLabelCb.checked = sl !== "false";
+      if (lp && (lp === "left" || lp === "right")) labelPosSelect.value = lp;
+      labelPosField.style.display = showLabelCb.checked ? "" : "none";
 
       initPreview();
       if (url) loadFeed();
