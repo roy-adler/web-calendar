@@ -325,6 +325,7 @@
         <div class="field">
           <label for="icsUrl">ICS Feed URL</label>
           <input id="icsUrl" type="url" placeholder="https://example.com/feed.ics" />
+          <button class="btn-load" id="loadBtn" style="margin-top:0.5rem">Load Calendar</button>
         </div>
 
         <div class="field">
@@ -462,7 +463,6 @@
           </div>
         </div>
 
-        <button class="btn-load" id="loadBtn">Load Calendar</button>
       </div>
 
       <!-- Preview + snippet -->
@@ -905,14 +905,11 @@
 
       if (p.get("nextCardFull") === "true") nextCardFullCb.checked = true;
 
-      if (url) {
-        initPreview();
-        loadFeed();
-        return;
-      }
+      initPreview();
+      if (url) loadFeed();
     })();
 
-    initPreview();
+    if (!location.search) initPreview();
   </script>
 </body>
 </html>
