@@ -15,7 +15,7 @@ WebCalendar.registerLang("en", {
   loadFailed: "Failed to load feed: ",
   load: "Load",
   placeholder: "Paste an ICS feed URL here...",
-  happeningNow: "Happening now", startingNow: "Starting now", startsIn: "Starts in",
+  happeningNow: "Happening now", startingNow: "Starting now", startsIn: "Starts in", ended: "Ended",
   day: "day", days: "days", hr: "hr", hrs: "hrs", min: "min",
   more: "more", of: "of", upcoming: "upcoming"
 });
@@ -37,7 +37,7 @@ WebCalendar.registerLang("de", {
   loadFailed: "Feed konnte nicht geladen werden: ",
   load: "Laden",
   placeholder: "ICS-Feed-URL hier einf\u00fcgen...",
-  happeningNow: "Findet gerade statt", startingNow: "Beginnt jetzt", startsIn: "Beginnt in",
+  happeningNow: "Findet gerade statt", startingNow: "Beginnt jetzt", startsIn: "Beginnt in", ended: "Beendet",
   day: "Tag", days: "Tagen", hr: "Std.", hrs: "Std.", min: "Min.",
   more: "weitere", of: "von", upcoming: "bevorstehend"
 });
@@ -59,7 +59,7 @@ WebCalendar.registerLang("fr", {
   loadFailed: "\u00c9chec du chargement : ",
   load: "Charger",
   placeholder: "Collez l\u2019URL d\u2019un flux ICS ici...",
-  happeningNow: "En cours", startingNow: "Commence maintenant", startsIn: "Commence dans",
+  happeningNow: "En cours", startingNow: "Commence maintenant", startsIn: "Commence dans", ended: "Termin\u00e9",
   day: "jour", days: "jours", hr: "h", hrs: "h", min: "min",
   more: "de plus", of: "sur", upcoming: "\u00e0 venir"
 });
@@ -81,7 +81,7 @@ WebCalendar.registerLang("it", {
   loadFailed: "Caricamento feed fallito: ",
   load: "Carica",
   placeholder: "Incolla l\u2019URL di un feed ICS qui...",
-  happeningNow: "In corso", startingNow: "Inizia ora", startsIn: "Inizia tra",
+  happeningNow: "In corso", startingNow: "Inizia ora", startsIn: "Inizia tra", ended: "Terminato",
   day: "giorno", days: "giorni", hr: "ora", hrs: "ore", min: "min",
   more: "altri", of: "di", upcoming: "in programma"
 });
@@ -103,7 +103,7 @@ WebCalendar.registerLang("ru", {
   loadFailed: "\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044c \u043b\u0435\u043d\u0442\u0443: ",
   load: "\u0417\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044c",
   placeholder: "\u0412\u0441\u0442\u0430\u0432\u044c\u0442\u0435 URL ICS-\u043b\u0435\u043d\u0442\u044b \u0437\u0434\u0435\u0441\u044c...",
-  happeningNow: "\u0421\u0435\u0439\u0447\u0430\u0441", startingNow: "\u041d\u0430\u0447\u0438\u043d\u0430\u0435\u0442\u0441\u044f", startsIn: "\u041d\u0430\u0447\u043d\u0451\u0442\u0441\u044f \u0447\u0435\u0440\u0435\u0437",
+  happeningNow: "\u0421\u0435\u0439\u0447\u0430\u0441", startingNow: "\u041d\u0430\u0447\u0438\u043d\u0430\u0435\u0442\u0441\u044f", startsIn: "\u041d\u0430\u0447\u043d\u0451\u0442\u0441\u044f \u0447\u0435\u0440\u0435\u0437", ended: "\u0417\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e",
   day: "\u0434\u0435\u043d\u044c", days: "\u0434\u043d.", hr: "\u0447.", hrs: "\u0447.", min: "\u043c\u0438\u043d.",
   more: "\u0435\u0449\u0451", of: "\u0438\u0437", upcoming: "\u043f\u0440\u0435\u0434\u0441\u0442\u043e\u044f\u0449\u0438\u0445"
 });

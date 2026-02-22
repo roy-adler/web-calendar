@@ -570,8 +570,11 @@
     return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   }
 
-  function formatCountdown(ms, tr) {
-    if (ms <= 0) return tr.happeningNow;
+  function formatCountdown(ms, tr, endMs) {
+    if (ms <= 0) {
+      if (endMs != null && endMs <= 0) return tr.ended;
+      return tr.happeningNow;
+    }
     var mins = Math.floor(ms / 60000);
     var hrs = Math.floor(mins / 60);
     var days = Math.floor(hrs / 24);
@@ -980,7 +983,8 @@
   WebCalendar.prototype._nextCardHtml = function (ev, tr, now, inlineMap) {
     var dateStr = tr.dowFull[ev.dtstart.getDay()] + ", " +
       tr.monthsFull[ev.dtstart.getMonth()] + " " + ev.dtstart.getDate() + ", " + ev.dtstart.getFullYear();
-    var countdown = formatCountdown(ev.dtstart - now, tr);
+    var endMs = ev.dtend ? ev.dtend - now : null;
+    var countdown = formatCountdown(ev.dtstart - now, tr, endMs);
     var fullClass = this.opts.nextCardFull ? ' wc-next-full' : '';
 
     var html = '<div class="wc-next-card' + fullClass + '">';
