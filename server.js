@@ -6,6 +6,9 @@ const PORT = 3000;
 
 // Serve static files
 app.use(express.static(path.join(__dirname, "public")));
+app.get("/web-calendar-logo.png", (req, res) => {
+  res.sendFile(path.join(__dirname, "web-calendar-logo.png"));
+});
 
 // Allow cross-origin requests so the widget works when embedded on other sites
 app.use("/api", (req, res, next) => {
