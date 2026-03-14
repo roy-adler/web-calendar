@@ -560,6 +560,7 @@
     showToday: true,
     showNext: true,
     showViewSelect: true,
+    showSubscribe: true,
     showLabel: true,
     labelPosition: "right",
     showMaps: false,
@@ -828,6 +829,7 @@
     var showToday = this.opts.showToday !== false;
     var showNext = this.opts.showNext !== false;
     var showViewSelect = this.opts.showViewSelect !== false;
+    var showSubscribe = this.opts.showSubscribe !== false;
 
     var btns = '';
     if (showPrev) btns += '<button data-wc-nav="prev">' + tr.prev + '</button>';
@@ -842,7 +844,7 @@
       '</select>';
     }
     var subscribeHref = this._subscribeHref();
-    if (subscribeHref) {
+    if (showSubscribe && subscribeHref) {
       btns += '<a class="wc-subscribe-btn" href="' + escapeHtml(subscribeHref) + '">' + escapeHtml(tr.subscribe || "Subscribe") + '</a>';
     }
 
@@ -1235,7 +1237,7 @@
 
   WebCalendar.prototype.setOption = function (key, value) {
     this.opts[key] = value;
-    if (key === "view" || key === "lang" || key === "showPrev" || key === "showToday" || key === "showNext" || key === "showViewSelect" || key === "showLabel" || key === "labelPosition" || key === "showMaps" || key === "mapPosition" || key === "nextCardFull") {
+    if (key === "view" || key === "lang" || key === "showPrev" || key === "showToday" || key === "showNext" || key === "showViewSelect" || key === "showSubscribe" || key === "showLabel" || key === "labelPosition" || key === "showMaps" || key === "mapPosition" || key === "nextCardFull") {
       this._render();
     } else {
       applyStyles(this.el, this.opts);
@@ -1268,6 +1270,7 @@
       var showToday = el.getAttribute("data-show-today");
       var showNext = el.getAttribute("data-show-next");
       var showViewSelect = el.getAttribute("data-show-view-select");
+      var showSubscribe = el.getAttribute("data-show-subscribe");
       var showLabel = el.getAttribute("data-show-label");
       var labelPosition = el.getAttribute("data-label-position") || "";
       var showMaps = el.getAttribute("data-show-maps");
@@ -1286,6 +1289,7 @@
         showToday: showToday != null ? showToday !== "false" : undefined,
         showNext: showNext != null ? showNext !== "false" : undefined,
         showViewSelect: showViewSelect != null ? showViewSelect !== "false" : undefined,
+        showSubscribe: showSubscribe != null ? showSubscribe !== "false" : undefined,
         showLabel: showLabel != null ? showLabel !== "false" : undefined,
         labelPosition: labelPosition || undefined,
         showMaps: showMaps != null ? showMaps !== "false" : undefined,

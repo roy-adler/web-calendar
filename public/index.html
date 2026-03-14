@@ -430,6 +430,10 @@
               <span>View Selector</span>
             </label>
             <label class="toggle-row">
+              <input type="checkbox" id="showSubscribe" checked />
+              <span>Subscribe Button</span>
+            </label>
+            <label class="toggle-row">
               <input type="checkbox" id="showLabel" checked />
               <span>Date Label</span>
             </label>
@@ -525,6 +529,7 @@
     var showTodayCb    = document.getElementById("showToday");
     var showNextCb     = document.getElementById("showNext");
     var showViewSelCb  = document.getElementById("showViewSelect");
+    var showSubscribeCb = document.getElementById("showSubscribe");
     var showLabelCb    = document.getElementById("showLabel");
     var labelPosSelect = document.getElementById("labelPosSelect");
     var labelPosField  = document.getElementById("labelPosField");
@@ -592,6 +597,7 @@
       if (!showTodayCb.checked)             attrs += ' data-show-today="false"';
       if (!showNextCb.checked)              attrs += ' data-show-next="false"';
       if (!showViewSelCb.checked)           attrs += ' data-show-view-select="false"';
+      if (!showSubscribeCb.checked)         attrs += ' data-show-subscribe="false"';
       if (!showLabelCb.checked)             attrs += ' data-show-label="false"';
       if (labelPosSelect.value !== D.labelPosition) attrs += ' data-label-position="' + escHtml(labelPosSelect.value) + '"';
       if (showMapsCb.checked)                     attrs += ' data-show-maps="true"';
@@ -632,6 +638,7 @@
       if (!showTodayCb.checked) p.set("showToday", "false");
       if (!showNextCb.checked) p.set("showNext", "false");
       if (!showViewSelCb.checked) p.set("showViewSelect", "false");
+      if (!showSubscribeCb.checked) p.set("showSubscribe", "false");
       if (!showLabelCb.checked) p.set("showLabel", "false");
       if (labelPosSelect.value !== D.labelPosition) p.set("labelPosition", labelPosSelect.value);
       if (showMapsCb.checked) p.set("showMaps", "true");
@@ -658,6 +665,7 @@
         showToday: showTodayCb.checked,
         showNext: showNextCb.checked,
         showViewSelect: showViewSelCb.checked,
+        showSubscribe: showSubscribeCb.checked,
         showLabel: showLabelCb.checked,
         labelPosition: labelPosSelect.value,
         showMaps: showMapsCb.checked,
@@ -727,6 +735,7 @@
     bindToggle(showTodayCb, "showToday");
     bindToggle(showNextCb, "showNext");
     bindToggle(showViewSelCb, "showViewSelect");
+    bindToggle(showSubscribeCb, "showSubscribe");
 
     showLabelCb.addEventListener("change", function () {
       if (cal) cal.setOption("showLabel", this.checked);
@@ -837,10 +846,12 @@
       var st = el.getAttribute("data-show-today");
       var sn = el.getAttribute("data-show-next");
       var sv = el.getAttribute("data-show-view-select");
+      var ss = el.getAttribute("data-show-subscribe");
       showPrevCb.checked = sp !== "false";
       showTodayCb.checked = st !== "false";
       showNextCb.checked = sn !== "false";
       showViewSelCb.checked = sv !== "false";
+      showSubscribeCb.checked = ss !== "false";
 
       var sl = el.getAttribute("data-show-label");
       var lp = el.getAttribute("data-label-position") || "";
@@ -908,6 +919,7 @@
       if (p.get("showToday") === "false") showTodayCb.checked = false;
       if (p.get("showNext") === "false") showNextCb.checked = false;
       if (p.get("showViewSelect") === "false") showViewSelCb.checked = false;
+      if (p.get("showSubscribe") === "false") showSubscribeCb.checked = false;
 
       var sl = p.get("showLabel");
       if (sl === "false") showLabelCb.checked = false;
