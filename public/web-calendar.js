@@ -84,7 +84,7 @@
     }
     .wc-week-nav .wc-subscribe-btn {
       text-decoration: none;
-      display: none;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       white-space: nowrap;
@@ -466,9 +466,6 @@
         padding: 0.35rem 0.6rem;
         font-size: 0.8rem;
         white-space: nowrap;
-      }
-      .wc-week-nav .wc-subscribe-btn {
-        display: inline-flex;
       }
       .wc-view-select {
         padding: 0.35rem 0.45rem;
