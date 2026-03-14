@@ -610,19 +610,39 @@
     }
   }
 
-  var SCRIPT_ORIGIN = (function () {
+  var SCRIPT_INFO = (function () {
     var s = document.currentScript;
-    if (!s || !s.src) return "";
-    try { return new URL(s.src).origin; } catch (e) { return ""; }
+    if (!s || !s.src) return { origin: "", cssHref: "/web-calendar.css" };
+    try {
+      var u = new URL(s.src);
+      var basePath = u.pathname.replace(/[^/]+$/, "");
+      return { origin: u.origin, cssHref: u.origin + basePath + "web-calendar.css" };
+    } catch (e) {
+      return { origin: "", cssHref: "/web-calendar.css" };
+    }
   })();
+  var SCRIPT_ORIGIN = SCRIPT_INFO.origin;
 
   var TRANSLATIONS = {};
 
   function injectStyles() {
     if (STYLES_INJECTED) return;
-    var style = document.createElement("style");
-    style.textContent = CSS;
-    document.head.appendChild(style);
+    if (document.querySelector('link[data-web-calendar-css]')) {
+      STYLES_INJECTED = true;
+      return;
+    }
+
+    var link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = SCRIPT_INFO.cssHref;
+    link.setAttribute("data-web-calendar-css", "1");
+    link.onerror = function () {
+      // Fallback for environments where separate CSS is unavailable.
+      var style = document.createElement("style");
+      style.textContent = CSS;
+      document.head.appendChild(style);
+    };
+    document.head.appendChild(link);
     STYLES_INJECTED = true;
   }
 
