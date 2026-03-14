@@ -92,6 +92,7 @@
       color: var(--wc-card);
       border-color: var(--wc-text);
     }
+    .wc-week-nav .wc-nav-short { display: none; }
     .wc-week-nav button:hover,
     .wc-week-nav .wc-subscribe-btn:hover { background: var(--wc-accent-light); }
     .wc-week-nav .wc-subscribe-btn:hover {
@@ -475,6 +476,14 @@
         font-size: 0.8rem;
         white-space: nowrap;
       }
+      .wc-week-nav button[data-wc-nav="prev"] .wc-nav-full,
+      .wc-week-nav button[data-wc-nav="next"] .wc-nav-full {
+        display: none;
+      }
+      .wc-week-nav button[data-wc-nav="prev"] .wc-nav-short,
+      .wc-week-nav button[data-wc-nav="next"] .wc-nav-short {
+        display: inline;
+      }
       .wc-view-select {
         padding: 0.35rem 0.45rem;
         font-size: 0.8rem;
@@ -840,9 +849,9 @@
     var showSubscribe = this.opts.showSubscribe !== false;
 
     var btns = '';
-    if (showPrev) btns += '<button data-wc-nav="prev">' + tr.prev + '</button>';
+    if (showPrev) btns += '<button data-wc-nav="prev" aria-label="' + escapeHtml(tr.prev) + '"><span class="wc-nav-full">' + tr.prev + '</span><span class="wc-nav-short">&lsaquo;</span></button>';
     if (showToday) btns += '<button data-wc-nav="today">' + tr.today + '</button>';
-    if (showNext) btns += '<button data-wc-nav="next">' + tr.next + '</button>';
+    if (showNext) btns += '<button data-wc-nav="next" aria-label="' + escapeHtml(tr.next) + '"><span class="wc-nav-full">' + tr.next + '</span><span class="wc-nav-short">&rsaquo;</span></button>';
     if (showViewSelect) {
       btns += '<select class="wc-view-select" data-wc-view>' +
         '<option value="day"' + (view === "day" ? " selected" : "") + '>' + tr.viewDay + '</option>' +
