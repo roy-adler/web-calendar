@@ -88,9 +88,17 @@
       align-items: center;
       justify-content: center;
       white-space: nowrap;
+      background: var(--wc-text);
+      color: var(--wc-card);
+      border-color: var(--wc-text);
     }
     .wc-week-nav button:hover,
     .wc-week-nav .wc-subscribe-btn:hover { background: var(--wc-accent-light); }
+    .wc-week-nav .wc-subscribe-btn:hover {
+      background: var(--wc-text-light);
+      border-color: var(--wc-text-light);
+      color: var(--wc-card);
+    }
     .wc-nav-reversed { flex-direction: row-reverse; }
     .wc-nav-reversed .wc-label { text-align: left; }
     .wc-nav-reversed .wc-btns { justify-content: flex-end; }
