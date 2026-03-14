@@ -69,7 +69,8 @@
       display: flex;
       gap: 0.4rem;
     }
-    .wc-week-nav button {
+    .wc-week-nav button,
+    .wc-week-nav .wc-subscribe-btn {
       padding: 0.4rem 0.9rem;
       background: var(--wc-card);
       border: 1px solid var(--wc-border);
@@ -81,7 +82,15 @@
       font-family: inherit;
       color: var(--wc-text);
     }
-    .wc-week-nav button:hover { background: var(--wc-accent-light); }
+    .wc-week-nav .wc-subscribe-btn {
+      text-decoration: none;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+    }
+    .wc-week-nav button:hover,
+    .wc-week-nav .wc-subscribe-btn:hover { background: var(--wc-accent-light); }
     .wc-nav-reversed { flex-direction: row-reverse; }
     .wc-nav-reversed .wc-label { text-align: left; }
     .wc-nav-reversed .wc-btns { justify-content: flex-end; }
@@ -452,10 +461,14 @@
       .wc-nav-reversed .wc-label {
         text-align: center;
       }
-      .wc-week-nav button {
+      .wc-week-nav button,
+      .wc-week-nav .wc-subscribe-btn {
         padding: 0.35rem 0.6rem;
         font-size: 0.8rem;
         white-space: nowrap;
+      }
+      .wc-week-nav .wc-subscribe-btn {
+        display: inline-flex;
       }
       .wc-view-select {
         padding: 0.35rem 0.45rem;
@@ -710,6 +723,7 @@
     this.nextOffset = 0;
     this.server = this.opts.server || SCRIPT_ORIGIN || "";
     this._nextInitial = true;
+    this._feedUrl = this.opts.url || "";
 
     injectStyles();
     this.el.classList.add("wc-container");
@@ -765,6 +779,7 @@
   WebCalendar.prototype.loadFeed = function (url) {
     if (!url) return;
     var self = this;
+    this._feedUrl = url;
     var proxyUrl = this.server + "/api/feed?url=" + encodeURIComponent(url);
 
     var tr = this._tr();
@@ -828,6 +843,10 @@
         '<option value="month"' + (view === "month" ? " selected" : "") + '>' + tr.viewMonth + '</option>' +
         '<option value="next"' + (view === "next" ? " selected" : "") + '>' + tr.viewNext + '</option>' +
       '</select>';
+    }
+    var subscribeHref = this._subscribeHref();
+    if (subscribeHref) {
+      btns += '<a class="wc-subscribe-btn" href="' + escapeHtml(subscribeHref) + '">' + escapeHtml(tr.subscribe || "Subscribe") + '</a>';
     }
 
     var showLabel = this.opts.showLabel !== false;
@@ -934,6 +953,20 @@
     if (pos !== "auto") return pos;
     var w = this.el.offsetWidth || 0;
     return w >= 600 ? "right" : "below";
+  };
+
+  WebCalendar.prototype._subscribeHref = function () {
+    var raw = (this._feedUrl || this.opts.url || "").trim();
+    if (!raw) return "";
+
+    var ua = navigator.userAgent || "";
+    var isIOS = /iPhone|iPad|iPod/i.test(ua) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+    if (isIOS && /^https?:\/\//i.test(raw)) {
+      return raw.replace(/^https?/i, "webcal");
+    }
+    return raw;
   };
 
   WebCalendar.prototype._syncMapHeight = function () {
