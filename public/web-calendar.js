@@ -1209,10 +1209,18 @@
 
     if (this._nextInitial) {
       var firstUpcoming = -1;
+      var firstOngoing = -1;
       for (var i = 0; i < allSorted.length; i++) {
+        if (firstOngoing < 0 && allSorted[i].dtend && allSorted[i].dtstart <= now && allSorted[i].dtend > now) {
+          firstOngoing = i;
+        }
         if (allSorted[i].dtstart >= now) { firstUpcoming = i; break; }
       }
-      this.nextOffset = firstUpcoming >= 0 ? firstUpcoming : allSorted.length - 1;
+      if (firstOngoing >= 0) {
+        this.nextOffset = firstOngoing;
+      } else {
+        this.nextOffset = firstUpcoming >= 0 ? firstUpcoming : allSorted.length - 1;
+      }
       this._nextInitial = false;
     }
 
