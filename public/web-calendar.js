@@ -21,6 +21,7 @@
       --wc-event-bg: #4f6ef7;
       --wc-event-text: #ffffff;
       --wc-radius: 10px;
+      container-type: inline-size;
     }
     .wc-container * { margin: 0; padding: 0; box-sizing: border-box; word-break: normal; overflow-wrap: normal; hyphens: none; -webkit-hyphens: none; }
     .wc-feed-bar {
@@ -57,8 +58,10 @@
     .wc-feed-bar button:hover { opacity: 0.85; }
     .wc-week-nav {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
+      gap: 0.5rem;
       margin-bottom: 1rem;
     }
     .wc-week-nav .wc-label {
@@ -67,6 +70,7 @@
     }
     .wc-week-nav .wc-btns {
       display: flex;
+      flex-wrap: wrap;
       gap: 0.4rem;
     }
     .wc-week-nav button,
@@ -168,7 +172,7 @@
       font-size: 0.9rem;
     }
     .wc-status.wc-error { color: #e53e3e; }
-    @media (max-width: 640px) {
+    @container (max-width: 640px) {
       .wc-week-grid { grid-template-columns: 1fr; }
       .wc-day-col { min-height: auto; }
       .wc-day-header {
@@ -314,7 +318,7 @@
       flex: 1;
       min-height: 180px;
     }
-    @media (max-width: 640px) {
+    @container (max-width: 640px) {
       .wc-day-layout-side {
         grid-template-columns: 1fr;
       }
@@ -383,7 +387,7 @@
       color: var(--wc-text-light);
       padding: 0.05rem 0.25rem;
     }
-    @media (max-width: 640px) {
+    @container (max-width: 640px) {
       .wc-month-day { min-height: 50px; }
       .wc-month-event { font-size: 0.6rem; }
     }
@@ -405,6 +409,14 @@
     .wc-next-card.wc-next-full {
       max-width: none;
     }
+    .wc-next-view > .wc-maps-section {
+      width: 100%;
+      max-width: 480px;
+      margin: 0.75rem 0;
+    }
+    .wc-next-view:has(.wc-next-full) > .wc-maps-section {
+      max-width: none;
+    }
     .wc-next-when {
       font-size: 0.8rem;
       font-weight: 600;
@@ -424,6 +436,7 @@
       margin-bottom: 0.25rem;
     }
     .wc-next-location {
+      white-space: pre-line;
       font-size: 0.85rem;
       color: var(--wc-text-light);
       font-style: italic;
@@ -447,9 +460,9 @@
       margin-top: 0.75rem;
     }
     @media (max-width: 600px) {
-      .wc-container {
-        padding: 0.75rem;
-      }
+      .wc-container { padding: 0.75rem; }
+    }
+    @container (max-width: 600px) {
       .wc-week-nav {
         flex-wrap: wrap;
         gap: 0.4rem;
@@ -582,31 +595,117 @@
     labelPosition: "right",
     showMaps: false,
     mapPosition: "auto",
-    nextCardFull: false
+    nextCardFull: false,
+    theme: "light"
   };
+
+  // Does the embedding page currently look dark? An explicit theme on <html>
+  // or <body> (data-theme, data-bs-theme, or a "dark"/"light" class) wins;
+  // otherwise follow the visitor's system setting.
+  function pageIsDark() {
+    var nodes = [document.documentElement, document.body];
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      if (!n) continue;
+      var attr = (n.getAttribute("data-theme") || n.getAttribute("data-bs-theme") || "").toLowerCase();
+      if (attr === "dark" || attr === "light") return attr === "dark";
+      if (n.classList.contains("dark")) return true;
+      if (n.classList.contains("light")) return false;
+    }
+    return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  }
+
+  function isDarkTheme(opts) {
+    var theme = opts.theme || DEFAULTS.theme;
+    if (theme === "dark") return true;
+    if (theme === "auto") return pageIsDark();
+    return false;
+  }
+
+  // Colours for the current theme. In dark mode, colours not given as
+  // *ColorDark options are derived from the accent colour.
+  function palette(opts) {
+    var accent = opts.accent || DEFAULTS.accent;
+    if (!isDarkTheme(opts)) {
+      return {
+        dark: false,
+        accent: accent,
+        bg: opts.bg,
+        text: opts.textColor,
+        card: opts.cardColor
+      };
+    }
+    return {
+      dark: true,
+      accent: accent,
+      bg: opts.bgDark || (opts.bg === "transparent" ? "transparent" : mix("#141317", accent, 0.05)),
+      text: opts.textColorDark || mix("#f3f1f5", accent, 0.2),
+      card: opts.cardColorDark || mix("#1e1c21", accent, 0.1)
+    };
+  }
 
   function applyStyles(el, opts) {
     var s = el.style;
-    var accent = opts.accent || DEFAULTS.accent;
-    var card = opts.cardColor || DEFAULTS.cardColor;
+    var p = palette(opts);
+    var accent = p.accent;
+    var card = p.card || DEFAULTS.cardColor;
 
+    el.classList.toggle("wc-dark", p.dark);
+    s.setProperty("color-scheme", p.dark ? "dark" : "light");
     s.setProperty("--wc-accent", accent);
     s.setProperty("--wc-event-bg", accent);
-    s.setProperty("--wc-accent-light", mix(card, accent, 0.15));
-    s.setProperty("--wc-today-bg", mix(card, accent, 0.10));
+    s.setProperty("--wc-accent-light", mix(card, accent, p.dark ? 0.25 : 0.15));
+    s.setProperty("--wc-today-bg", mix(card, accent, p.dark ? 0.18 : 0.10));
 
-    if (opts.bg) s.setProperty("--wc-bg", opts.bg);
-    if (opts.textColor) {
-      s.setProperty("--wc-text", opts.textColor);
-      s.setProperty("color", opts.textColor);
-      s.setProperty("--wc-text-light", tint(opts.textColor, 0.4));
+    if (p.bg) s.setProperty("--wc-bg", p.bg);
+    else s.removeProperty("--wc-bg");
+    if (p.text) {
+      s.setProperty("--wc-text", p.text);
+      s.setProperty("color", p.text);
+      s.setProperty("--wc-text-light", p.dark ? mix(p.text, card, 0.35) : tint(p.text, 0.4));
+    } else {
+      s.removeProperty("--wc-text");
+      s.removeProperty("color");
+      s.removeProperty("--wc-text-light");
     }
-    if (opts.cardColor) {
+    if (p.card) {
       s.setProperty("--wc-card", card);
-      s.setProperty("--wc-border", shade(card, 0.12));
+      s.setProperty("--wc-border", p.dark ? tint(card, 0.12) : shade(card, 0.12));
+    } else {
+      s.removeProperty("--wc-card");
+      s.removeProperty("--wc-border");
     }
     if (opts.radius != null) {
       s.setProperty("--wc-radius", opts.radius + "px");
+    }
+  }
+
+  // Calendars with theme "auto" re-colour themselves when the page or the
+  // system switches between light and dark.
+  var AUTO_THEMED = [];
+  var themeWatcherStarted = false;
+
+  function refreshAutoThemed() {
+    for (var i = 0; i < AUTO_THEMED.length; i++) {
+      var cal = AUTO_THEMED[i];
+      if ((cal.opts.theme || DEFAULTS.theme) === "auto") applyStyles(cal.el, cal.opts);
+    }
+  }
+
+  function watchTheme(cal) {
+    if (AUTO_THEMED.indexOf(cal) < 0) AUTO_THEMED.push(cal);
+    if (themeWatcherStarted) return;
+    themeWatcherStarted = true;
+    if (window.matchMedia) {
+      var mq = window.matchMedia("(prefers-color-scheme: dark)");
+      if (mq.addEventListener) mq.addEventListener("change", refreshAutoThemed);
+      else if (mq.addListener) mq.addListener(refreshAutoThemed);
+    }
+    if (window.MutationObserver) {
+      var observer = new MutationObserver(refreshAutoThemed);
+      var config = { attributes: true, attributeFilter: ["class", "data-theme", "data-bs-theme"] };
+      observer.observe(document.documentElement, config);
+      if (document.body) observer.observe(document.body, config);
     }
   }
 
@@ -653,6 +752,13 @@
   }
 
   // ---- ICS Parser ----
+  // ICS text values escape newlines, commas, semicolons and backslashes.
+  function unescapeICS(val) {
+    return val.replace(/\\([nN,;\\])/g, function (m, c) {
+      return c === "n" || c === "N" ? "\n" : c;
+    });
+  }
+
   function parseICS(text) {
     var parsed = [];
     var blocks = text.split("BEGIN:VEVENT");
@@ -669,9 +775,9 @@
         var val = line.slice(colonIdx + 1);
         if (key.startsWith("DTSTART")) ev.dtstart = parseICSDate(key, val);
         else if (key.startsWith("DTEND")) ev.dtend = parseICSDate(key, val);
-        else if (key === "SUMMARY") ev.summary = val;
-        else if (key === "LOCATION") ev.location = val;
-        else if (key === "DESCRIPTION") ev.description = val;
+        else if (key === "SUMMARY") ev.summary = unescapeICS(val);
+        else if (key === "LOCATION") ev.location = unescapeICS(val);
+        else if (key === "DESCRIPTION") ev.description = unescapeICS(val);
       }
       if (ev.dtstart && ev.summary) parsed.push(ev);
     }
@@ -764,9 +870,18 @@
     this.el.classList.add("wc-container");
     applyStyles(this.el, this.opts);
 
+    if ((this.opts.theme || DEFAULTS.theme) === "auto") watchTheme(this);
+
     var self = this;
+    this._lastMapPos = null;
     window.addEventListener("resize", function () {
-      self._syncMapHeight();
+      // With mapPosition "auto" the map moves beside or below the event
+      // depending on the calendar's width, so re-render when that flips.
+      if (self.opts.showMaps === true && self._lastMapPos && self._resolveMapPos() !== self._lastMapPos) {
+        self._render();
+      } else {
+        self._syncMapHeight();
+      }
     });
 
     this._calDiv = document.createElement("div");
@@ -988,7 +1103,9 @@
     var pos = this.opts.mapPosition || "auto";
     if (pos !== "auto") return pos;
     var w = this.el.offsetWidth || 0;
-    return w >= 600 ? "right" : "below";
+    pos = w >= 600 ? "right" : "below";
+    this._lastMapPos = pos;
+    return pos;
   };
 
   WebCalendar.prototype._subscribeHref = function () {
@@ -1017,14 +1134,14 @@
     if (!iframe) return;
 
     iframe.style.height = "";
-    var cardH = cardEl.offsetHeight;
+    var cardH = Math.min(cardEl.offsetHeight, 280);
     if (cardH > 100) {
       iframe.style.height = cardH + "px";
     }
   };
 
   WebCalendar.prototype._mapIframe = function (location) {
-    var q = encodeURIComponent(location);
+    var q = encodeURIComponent(location.replace(/\s*\n\s*/g, ", "));
     var pinSvg = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
       '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
     var tr = this._tr();
@@ -1282,6 +1399,7 @@
 
   WebCalendar.prototype.setOption = function (key, value) {
     this.opts[key] = value;
+    if (key === "theme" && value === "auto") watchTheme(this);
     if (key === "view" || key === "lang" || key === "showPrev" || key === "showToday" || key === "showNext" || key === "showViewSelect" || key === "showSubscribe" || key === "showLabel" || key === "labelPosition" || key === "showMaps" || key === "mapPosition" || key === "nextCardFull") {
       this._render();
     } else {
@@ -1321,6 +1439,10 @@
       var showMaps = el.getAttribute("data-show-maps");
       var mapPosition = el.getAttribute("data-map-position") || "";
       var nextCardFull = el.getAttribute("data-next-card-full");
+      var theme = el.getAttribute("data-theme") || "";
+      var bgDark = el.getAttribute("data-bg-dark") || "";
+      var textColorDark = el.getAttribute("data-text-color-dark") || "";
+      var cardColorDark = el.getAttribute("data-card-color-dark") || "";
       el._webCalendar = new WebCalendar(el, {
         url: url || undefined,
         accent: accent || undefined,
@@ -1339,7 +1461,11 @@
         labelPosition: labelPosition || undefined,
         showMaps: showMaps != null ? showMaps !== "false" : undefined,
         mapPosition: mapPosition || undefined,
-        nextCardFull: nextCardFull != null ? nextCardFull !== "false" : undefined
+        nextCardFull: nextCardFull != null ? nextCardFull !== "false" : undefined,
+        theme: theme || (bgDark || textColorDark || cardColorDark ? "auto" : undefined),
+        bgDark: bgDark || undefined,
+        textColorDark: textColorDark || undefined,
+        cardColorDark: cardColorDark || undefined
       });
     });
   }

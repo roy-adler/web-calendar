@@ -15,6 +15,7 @@
   --wc-event-bg: #4f6ef7;
   --wc-event-text: #ffffff;
   --wc-radius: 10px;
+  container-type: inline-size;
 }
 .wc-container * { margin: 0; padding: 0; box-sizing: border-box; word-break: normal; overflow-wrap: normal; hyphens: none; -webkit-hyphens: none; }
 .wc-feed-bar {
@@ -51,8 +52,10 @@
 .wc-feed-bar button:hover { opacity: 0.85; }
 .wc-week-nav {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
+  gap: 0.5rem;
   margin-bottom: 1rem;
 }
 .wc-week-nav .wc-label {
@@ -61,6 +64,7 @@
 }
 .wc-week-nav .wc-btns {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.4rem;
 }
 .wc-week-nav button,
@@ -162,7 +166,7 @@
   font-size: 0.9rem;
 }
 .wc-status.wc-error { color: #e53e3e; }
-@media (max-width: 640px) {
+@container (max-width: 640px) {
   .wc-week-grid { grid-template-columns: 1fr; }
   .wc-day-col { min-height: auto; }
   .wc-day-header {
@@ -308,7 +312,7 @@
   flex: 1;
   min-height: 180px;
 }
-@media (max-width: 640px) {
+@container (max-width: 640px) {
   .wc-day-layout-side {
     grid-template-columns: 1fr;
   }
@@ -377,7 +381,7 @@
   color: var(--wc-text-light);
   padding: 0.05rem 0.25rem;
 }
-@media (max-width: 640px) {
+@container (max-width: 640px) {
   .wc-month-day { min-height: 50px; }
   .wc-month-event { font-size: 0.6rem; }
 }
@@ -399,6 +403,14 @@
 .wc-next-card.wc-next-full {
   max-width: none;
 }
+.wc-next-view > .wc-maps-section {
+  width: 100%;
+  max-width: 480px;
+  margin: 0.75rem 0;
+}
+.wc-next-view:has(.wc-next-full) > .wc-maps-section {
+  max-width: none;
+}
 .wc-next-when {
   font-size: 0.8rem;
   font-weight: 600;
@@ -418,6 +430,7 @@
   margin-bottom: 0.25rem;
 }
 .wc-next-location {
+  white-space: pre-line;
   font-size: 0.85rem;
   color: var(--wc-text-light);
   font-style: italic;
@@ -441,9 +454,9 @@
   margin-top: 0.75rem;
 }
 @media (max-width: 600px) {
-  .wc-container {
-    padding: 0.75rem;
-  }
+  .wc-container { padding: 0.75rem; }
+}
+@container (max-width: 600px) {
   .wc-week-nav {
     flex-wrap: wrap;
     gap: 0.4rem;

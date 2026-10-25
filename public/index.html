@@ -88,6 +88,15 @@
         </div>
 
         <div class="field">
+          <label for="themeSelect">Theme</label>
+          <select id="themeSelect">
+            <option value="light" selected>Light</option>
+            <option value="dark">Dark</option>
+            <option value="auto">Auto (follows the page or system)</option>
+          </select>
+        </div>
+
+        <div class="field">
           <label for="langSelect">Language</label>
           <select id="langSelect">
             <option value="en" selected>English</option>
@@ -210,6 +219,7 @@
     var radiusVal   = document.getElementById("radiusVal");
     var viewSelect  = document.getElementById("viewSelect");
     var langSelect  = document.getElementById("langSelect");
+    var themeSelect = document.getElementById("themeSelect");
     var loadBtn     = document.getElementById("loadBtn");
     var copyBtn     = document.getElementById("copyBtn");
     var snippetEl   = document.getElementById("snippetCode");
@@ -278,6 +288,7 @@
       if (url)                    attrs += ' data-url="' + escHtml(url) + '"';
       if (!isDefault(vw, D.view))          attrs += ' data-view="' + escHtml(vw) + '"';
       if (!isDefault(ln, D.lang))          attrs += ' data-lang="' + escHtml(ln) + '"';
+      if (themeSelect.value !== D.theme)    attrs += ' data-theme="' + escHtml(themeSelect.value) + '"';
       if (!isDefault(accent, D.accent))     attrs += ' data-accent="' + escHtml(accent) + '"';
       if (!isDefault(bg, D.bg))             attrs += ' data-bg="' + escHtml(bg) + '"';
       if (!isDefault(tc, D.textColor))      attrs += ' data-text-color="' + escHtml(tc) + '"';
@@ -319,6 +330,7 @@
       if (url) p.set("url", url);
       if (!isDefault(vw, D.view)) p.set("view", vw);
       if (!isDefault(ln, D.lang)) p.set("lang", ln);
+      if (themeSelect.value !== D.theme) p.set("theme", themeSelect.value);
       if (!isDefault(accent, D.accent)) p.set("accent", accent);
       if (!isDefault(bg, D.bg)) p.set("bg", bg);
       if (!isDefault(tc, D.textColor)) p.set("textColor", tc);
@@ -350,6 +362,7 @@
         radius: radiusSlider.value,
         view: viewSelect.value,
         lang: langSelect.value,
+        theme: themeSelect.value,
         noInput: true,
         showPrev: showPrevCb.checked,
         showToday: showTodayCb.checked,
@@ -412,6 +425,11 @@
 
     langSelect.addEventListener("change", function () {
       if (cal) cal.setOption("lang", this.value);
+      updateSnippet();
+    });
+
+    themeSelect.addEventListener("change", function () {
+      if (cal) cal.setOption("theme", this.value);
       updateSnippet();
     });
 
@@ -504,8 +522,10 @@
       var radius = el.getAttribute("data-radius");
       var view = el.getAttribute("data-view") || "";
       var lang = el.getAttribute("data-lang") || "";
+      var theme = el.getAttribute("data-theme") || "";
 
       if (url) icsInput.value = url;
+      if (["light","dark","auto"].indexOf(theme) >= 0) themeSelect.value = theme;
       if (accent && /^#[0-9a-f]{3,6}$/i.test(accent)) {
         accentHex.value = accent; accentPick.value = accent;
         syncPageAccent(accent);
@@ -577,8 +597,10 @@
       var r = p.get("radius");
       var vw = p.get("view");
       var ln = p.get("lang");
+      var th = p.get("theme");
 
       if (url) icsInput.value = url;
+      if (["light","dark","auto"].indexOf(th) >= 0) themeSelect.value = th;
       if (accent && /^#[0-9a-f]{3,6}$/i.test(accent)) {
         accentHex.value = accent; accentPick.value = accent;
         syncPageAccent(accent);

@@ -10,6 +10,7 @@ A weekly calendar widget that displays events from any public ICS feed. Configur
 - Week navigation (previous / today / next)
 - Today highlighting
 - Customizable accent color via `data-accent`
+- Light, dark, or automatic theme that follows the embedding page
 - Minimal ICS parser — no external calendar libraries
 - Embeddable widget — drop into any website with a single script tag
 
@@ -59,6 +60,8 @@ Include `web-calendar.js` and add a `data-web-calendar` element. Use the configu
 |---|---|
 | `data-url` / `url` | ICS feed URL. If provided, the calendar loads immediately with no input field. If omitted, an input field is shown. |
 | `data-accent` / `accent` | Accent hex color (e.g. `#e63946`). Drives event badges, today highlight, and buttons. Defaults to `#4f6ef7`. |
+| `data-theme` / `theme` | `light` (default), `dark`, or `auto`. `auto` follows the embedding page: a `data-theme`/`data-bs-theme` attribute or a `dark`/`light` class on `<html>` or `<body>`, otherwise the visitor's system setting. It switches live when the page or system changes. |
+| `data-bg-dark`, `data-text-color-dark`, `data-card-color-dark` | Optional colours for dark mode. Anything left out is derived from the accent colour. Setting any of them without `data-theme` turns on `auto`. |
 
 ### Proxy server
 
